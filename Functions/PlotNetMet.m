@@ -1,4 +1,4 @@
-function [] = PlotNetMet(ExpName, Params, HomeDir)
+function [] = PlotNetMet(ExpName, Params, HomeDir, oneFigureHandle)
 % Plot network metrics for MEA data
 % 
 % Parameters 
@@ -404,8 +404,15 @@ end
 p = [100 100 1200 800]; % this can be ammended accordingly 
 set(0, 'DefaultFigurePosition', p)
 
-if isfield(Params, 'oneFigure')
-    set(Params.oneFigure, 'Position', p);
+if Params.showOneFig
+    if isgraphics(oneFigureHandle)
+        set(oneFigureHandle, 'Position', p);
+    else 
+        oneFigureHandle = figure;
+        set(oneFigureHandle, 'Position', p);
+    end 
+else
+    figure
 end 
 
 for n = 1:length(eMet)
@@ -484,14 +491,16 @@ for n = 1:length(eMet)
     for nFigExt = 1:length(Params.figExt)
         figName = strcat(num2str(n),'_',regexprep(char(eMetl(n)),'\',''),Params.figExt{nFigExt});
         figPath = fullfile(graphMetricByLagFolder, figName);
+        figPath = strrep(figPath, '>', 'greater than');
+        figPath = strrep(figPath, '<', 'less than');
         saveas(gcf, figPath);
     end 
 
     % Close figure or clear the one shared figures
-    if ~isfield(Params, 'oneFigure')
+    if ~Params.showOneFig
         close(gcf)
     else
-        set(0, 'CurrentFigure', Params.oneFigure);
+        set(0, 'CurrentFigure', oneFigureHandle);
         clf reset
     end 
 end
@@ -513,8 +522,8 @@ if Params.includeNotBoxPlots
     p = [100 100 1300 600]; 
     set(0, 'DefaultFigurePosition', p)
 
-    if isfield(Params, 'oneFigure')
-        set(Params.oneFigure, 'Position', p);
+    if Params.showOneFig
+        set(oneFigureHandle, 'Position', p);
     end 
 
     for l = 1:length(Params.FuncConLagval)
@@ -595,10 +604,10 @@ if Params.includeNotBoxPlots
             end 
 
             % Close figure or clear the one shared figures
-            if ~isfield(Params, 'oneFigure')
+            if ~Params.showOneFig
                 close(gcf)
             else
-                set(0, 'CurrentFigure', Params.oneFigure);
+                set(0, 'CurrentFigure', oneFigureHandle);
                 clf reset
             end 
         end
@@ -623,8 +632,8 @@ eMetl = Params.networkLevelNetMetLabels;
 p = [100 100 1300 600]; 
 set(0, 'DefaultFigurePosition', p)
 
-if isfield(Params, 'oneFigure')
-    set(Params.oneFigure, 'Position', p);
+if Params.showOneFig
+    set(oneFigureHandle, 'Position', p);
 end 
 
 for l = 1:length(Params.FuncConLagval)
@@ -635,7 +644,7 @@ for l = 1:length(Params.FuncConLagval)
     end 
 
     for n = 1:length(eMet)
-        if ~isfield(Params, 'oneFigure')
+        if ~Params.showOneFig
             F1 = figure;
         end 
         eMeti = char(eMet(n));
@@ -659,7 +668,7 @@ for l = 1:length(Params.FuncConLagval)
                 if isempty(PlotDat)
                     continue
                 else
-                    eval(['HalfViolinPlot(PlotDat,xt(d),cDiv' num2str(d) ',0.3)']);
+                    eval(['HalfViolinPlot(PlotDat,xt(d),cDiv' num2str(d) ',Params.kdeHeight, Params.kdeWidthForOnePoint)']);
                 end
                 clear DatTemp ValMean ValStd UpperStd LowerStd
                 xtlabtext{d} = num2str(AgeDiv(d));
@@ -705,14 +714,16 @@ for l = 1:length(Params.FuncConLagval)
         for nFigExt = 1:length(Params.figExt)
             figName = strcat(num2str(n),'_',regexprep(char(eMetl(n)),'\',''), Params.figExt{nFigExt});
             figPath = fullfile(halfViolinPlotByGroupFolderPlusLag, figName);
+            figPath = strrep(figPath, '>', 'greater than');
+            figPath = strrep(figPath, '<', 'less than');
             saveas(gcf, figPath);
         end 
 
         % Close figure or clear the one shared figures
-        if ~isfield(Params, 'oneFigure')
+        if ~Params.showOneFig
             close(gcf)
         else
-            set(0, 'CurrentFigure', Params.oneFigure);
+            set(0, 'CurrentFigure', oneFigureHandle);
             clf reset
         end 
     end
@@ -738,8 +749,8 @@ if Params.includeNotBoxPlots
 
     p = [100 100 1300 600]; 
     set(0, 'DefaultFigurePosition', p)
-    if isfield(Params, 'oneFigure')
-        set(Params.oneFigure, 'Position', p);
+    if Params.showOneFig
+        set(oneFigureHandle, 'Position', p);
     end 
 
     for l = 1:length(Params.FuncConLagval)
@@ -789,14 +800,16 @@ if Params.includeNotBoxPlots
             for nFigExt = 1:length(Params.figExt)
                 figName = strcat(num2str(n),'_',regexprep(char(eMetl(n)),'\',''),Params.figExt{nFigExt});
                 figPath = fullfile(notBoxPlotByDivFolderPlusLag, figName);
+                figPath = strrep(figPath, '>', 'greater than');
+                figPath = strrep(figPath, '<', 'less than');
                 saveas(gcf, figPath);
             end 
 
             % Close figure or clear the one shared figures
-            if ~isfield(Params, 'oneFigure')
+            if ~Params.showOneFig
                 close(gcf)
             else
-                set(0, 'CurrentFigure', Params.oneFigure);
+                set(0, 'CurrentFigure', oneFigureHandle);
                 clf reset
             end 
         end
@@ -823,8 +836,8 @@ end
 
 p = [100 100 1300 600]; 
 set(0, 'DefaultFigurePosition', p)
-if isfield(Params, 'oneFigure')
-    set(Params.oneFigure, 'Position', p);
+if Params.showOneFig
+    set(oneFigureHandle, 'Position', p);
 end 
 
 for l = 1:length(Params.FuncConLagval)
@@ -854,7 +867,7 @@ for l = 1:length(Params.FuncConLagval)
                 PlotDat = DatTemp(:,l);
                 PlotDat(isnan(PlotDat)) = [];
                 if (1 - isempty(PlotDat))
-                    HalfViolinPlot(PlotDat, xt(g), Params.groupColors(g, :), 0.3);
+                    HalfViolinPlot(PlotDat, xt(g), Params.groupColors(g, :), Params.kdeHeight, Params.kdeWidthForOnePoint);
                 end
                 hold on
                 % clear DatTemp ValMean ValStd UpperStd LowerStd
@@ -904,14 +917,16 @@ for l = 1:length(Params.FuncConLagval)
         for nFigExt = 1:length(Params.figExt)
             figName = strcat(num2str(n),'_',regexprep(char(eMetl(n)),'\',''),Params.figExt{nFigExt});
             figPath = fullfile(halfViolinPlotByDivFolderPlusLag, figName);
+            figPath = strrep(figPath, '>', 'greater than');
+            figPath = strrep(figPath, '<', 'less than');
             saveas(gcf, figPath);
         end 
 
         % Close figure or clear the one shared figures
-        if ~isfield(Params, 'oneFigure')
+        if ~Params.showOneFig
             close(gcf)
         else
-            set(0, 'CurrentFigure', Params.oneFigure);
+            set(0, 'CurrentFigure', oneFigureHandle);
             clf reset
         end 
     end
@@ -928,8 +943,8 @@ eMetl = Params.unitLevelNetMetLabels;
 
 p = [100 100 1300 600]; 
 set(0, 'DefaultFigurePosition', p)
-if isfield(Params, 'oneFigure')
-    set(Params.oneFigure, 'Position', p);
+if Params.showOneFig
+    set(oneFigureHandle, 'Position', p);
 end 
 
 for l = 1:length(Params.FuncConLagval)
@@ -939,7 +954,7 @@ for l = 1:length(Params.FuncConLagval)
         mkdir(nodeByGroupFolderPlusLag)
     end 
     for n = 1:length(eMet)
-        if ~isfield(Params, 'oneFigure')
+        if ~Params.showOneFig
             F1 = figure;
         end 
         eMeti = char(eMet(n));
@@ -960,7 +975,7 @@ for l = 1:length(Params.FuncConLagval)
                 if isempty(PlotDat)
                     continue
                 else
-                    eval(['HalfViolinPlot(PlotDat,xt(d),cDiv' num2str(d) ',0.3)']);
+                    eval(['HalfViolinPlot(PlotDat,xt(d),cDiv' num2str(d) ', Params.kdeHeight, Params.kdeWidthForOnePoint)']);
                 end
                 clear DatTemp ValMean UpperStd LowerStd
                 xtlabtext{d} = num2str(AgeDiv(d));
@@ -981,14 +996,16 @@ for l = 1:length(Params.FuncConLagval)
         for nFigExt = 1:length(Params.figExt)
             figName = strcat(num2str(n),'_',regexprep(char(eMetl(n)),'\',''),Params.figExt{nFigExt});
             figPath = fullfile(nodeByGroupFolderPlusLag, figName);
+            figPath = strrep(figPath, '>', 'greater than');
+            figPath = strrep(figPath, '<', 'less than');
             saveas(gcf, figPath);
         end 
 
          % Close figure or clear the one shared figures
-        if ~isfield(Params, 'oneFigure')
+        if ~Params.showOneFig
             close(gcf)
         else
-            set(0, 'CurrentFigure', Params.oneFigure);
+            set(0, 'CurrentFigure', oneFigureHandle);
             clf reset
         end 
     end
@@ -1005,8 +1022,8 @@ eMetl = Params.unitLevelNetMetLabels;
 
 p = [100 100 1300 600]; 
 set(0, 'DefaultFigurePosition', p)
-if isfield(Params, 'oneFigure')
-    set(Params.oneFigure, 'Position', p);
+if Params.showOneFig
+    set(oneFigureHandle, 'Position', p);
 end 
 
 for l = 1:length(Params.FuncConLagval)
@@ -1040,7 +1057,7 @@ for l = 1:length(Params.FuncConLagval)
                 if isempty(PlotDat)
                     continue
                 else
-                    HalfViolinPlot(PlotDat, xt(g), Params.groupColors(g, :), 0.3);
+                    HalfViolinPlot(PlotDat, xt(g), Params.groupColors(g, :), Params.kdeHeight, Params.kdeWidthForOnePoint);
                 end
                 clear DatTemp ValMean ValStd UpperStd LowerStd
                 xtlabtext{g} = eGrp;
@@ -1061,14 +1078,16 @@ for l = 1:length(Params.FuncConLagval)
         for nFigExt = 1:length(Params.figExt)
             figName = strcat(num2str(n),'_',regexprep(char(eMetl(n)),'\',''),Params.figExt{nFigExt});
             figPath = fullfile(halfViolinPlotByAgeFolderPlusLag, figName);
+            figPath = strrep(figPath, '>', 'greater than');
+            figPath = strrep(figPath, '<', 'less than');
             saveas(gcf, figPath);
         end 
 
         % Close figure or clear the one shared figures
-        if ~isfield(Params, 'oneFigure')
+        if ~Params.showOneFig
             close(gcf)
         else
-            set(0, 'CurrentFigure', Params.oneFigure);
+            set(0, 'CurrentFigure', oneFigureHandle);
             clf reset
         end 
     end

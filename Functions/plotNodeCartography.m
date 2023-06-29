@@ -1,4 +1,4 @@
-function NetMet = plotNodeCartography(adjMs, Params, NetMet, Info, HomeDir, fileNameFolder)
+function NetMet = plotNodeCartography(adjMs, Params, NetMet, Info, HomeDir, fileNameFolder, oneFigureHandle)
 %
 % Parameters
 % ----------
@@ -63,7 +63,7 @@ for e = 1:length(lagval)
 
     % TODO Check if oneFigure object exists here, if not create it again 
     % Params.oneFigure = figure();
-    [NdCartDiv, PopNumNC] = NodeCartography(Z, PC, lagval, e, char(Info.FN), Params); 
+    [NdCartDiv, PopNumNC] = NodeCartography(Z, PC, lagval, e, char(Info.FN), Params, oneFigureHandle); 
 
     PopNumNCt(e,:) = PopNumNC;
     
@@ -74,19 +74,31 @@ for e = 1:length(lagval)
     NCpn5 = PopNumNC(5)/aN;
     NCpn6 = PopNumNC(6)/aN;
     
+    NCpn1count = PopNumNC(1);
+    NCpn2count = PopNumNC(2);
+    NCpn3count = PopNumNC(3);
+    NCpn4count = PopNumNC(4);
+    NCpn5count = PopNumNC(5);
+    NCpn6count = PopNumNC(6);
+    
+    
     if aN >= Params.minNumberOfNodesToCalNetMet
         % node cartography in circular plot
         NdCartDivOrd = NdCartDiv(On);
         StandardisedNetworkPlotNodeCartography(adjM, coords, ... 
-            edge_thresh, NdCartDivOrd, 'circular', char(Info.FN), '7', Params, lagval, e, lagFolder)
+            edge_thresh, NdCartDivOrd, 'circular', char(Info.FN), '7', Params, lagval, e, lagFolder, oneFigureHandle)
 
         % node cartography in grid plot 
         StandardisedNetworkPlotNodeCartography(adjM, coords, ... 
-            edge_thresh, NdCartDiv, 'MEA', char(Info.FN), '7', Params, lagval, e, lagFolder)
+            edge_thresh, NdCartDiv, 'MEA', char(Info.FN), '7', Params, lagval, e, lagFolder, oneFigureHandle)
 
         % add node cartography results to existing experiment file 
-        nodeCartVarsToSave = {'NCpn1', 'NCpn2','NCpn3','NCpn4','NCpn5','NCpn6'};
-        nodeCartVarsVals = {NCpn1, NCpn2, NCpn3, NCpn4, NCpn5, NCpn6};
+        nodeCartVarsToSave = {'NCpn1', 'NCpn2','NCpn3','NCpn4','NCpn5','NCpn6', ...
+                              'NCpn1count', 'NCpn2count', 'NCpn3count', ...
+                              'NCpn4count', 'NCpn5count', 'NCpn6count'};
+        nodeCartVarsVals = {NCpn1, NCpn2, NCpn3, NCpn4, NCpn5, NCpn6, ...
+                            NCpn1count, NCpn2count, NCpn3count, ...
+                            NCpn4count, NCpn5count, NCpn6count};
 
         for varCounter = 1:length(nodeCartVarsToSave)
             lagValField = strcat('adjM', num2str(lagval(e)), 'mslag');
@@ -95,12 +107,21 @@ for e = 1:length(lagval)
         end
     else 
         fprintf('Warning: not enough active nodes to plot node cartography \n')
+        % add NaNs to the NCpn fields
+        nodeCartVarsToSave = {'NCpn1', 'NCpn2','NCpn3','NCpn4','NCpn5','NCpn6', ...
+                              'NCpn1count', 'NCpn2count', 'NCpn3count', ...
+                              'NCpn4count', 'NCpn5count', 'NCpn6count'};
+        for varCounter = 1:length(nodeCartVarsToSave)
+            lagValField = strcat('adjM', num2str(lagval(e)), 'mslag');
+            varName = nodeCartVarsToSave{varCounter};
+            NetMet.(lagValField).(varName) = nan;
+        end
     end
 
 end 
 
 %% Plot node catography proportions 
-plotNodeCartographyProportions(NetMet, lagval, char(Info.FN), Params, lagFolder)
+plotNodeCartographyProportions(NetMet, lagval, char(Info.FN), Params, lagFolder, oneFigureHandle)
 
 
 end 

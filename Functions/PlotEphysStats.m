@@ -1,4 +1,4 @@
-function PlotEphysStats(ExpName, Params, HomeDir)
+function PlotEphysStats(ExpName, Params, HomeDir, oneFigureHandle)
 % plot ephys statistics for MEA data
 % Parameters 
 % -----------
@@ -9,7 +9,7 @@ function PlotEphysStats(ExpName, Params, HomeDir)
 %         the RGB colors to use for each group during plotting
 %     
 % HomeDir : str
-% 
+% oneFigureHandle : NaN or figure object
 % Returns
 % -------
 % None
@@ -252,7 +252,16 @@ p = [100 100 1300 600];
 set(0, 'DefaultFigurePosition', p)
 
 for n = 1:length(eMet)
-    F1 = figure;
+    if Params.showOneFig
+        if isgraphics(oneFigureHandle)
+            set(oneFigureHandle, 'Position', p);
+        else 
+            oneFigureHandle = figure;
+        end 
+    else 
+        F1 = figure;
+    end 
+    
     eMeti = char(eMet(n));
     xt = 1:0.5:1+(length(AgeDiv)-1)*0.5;
     for g = 1:length(Grps)
@@ -286,9 +295,19 @@ for n = 1:length(eMet)
     
     figName = strcat(num2str(n),'_',char(eMetl(n)));
     figPath = fullfile(notBoxPlotByGroupFolder, figName);
-    pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
+    
+    if Params.showOneFig
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, oneFigureHandle);
+    else
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
+    end 
+    
+    if Params.showOneFig
+        clf(oneFigureHandle)
+    else 
+        close(F1);
+    end 
 
-    close(F1)
 end
 
 %% halfViolinPlots - plots by group
@@ -308,7 +327,17 @@ set(0, 'DefaultFigurePosition', p)
 
 for n = 1:length(eMet)
     all_group_eMet_vals = [];
-    F1 = figure;
+    
+    if Params.showOneFig
+        if isgraphics(oneFigureHandle)
+            set(oneFigureHandle, 'Position', p);
+        else 
+            oneFigureHandle = figure;
+        end 
+    else 
+        F1 = figure;
+    end 
+    
     eMeti = char(eMet(n));
     xt = 1:length(AgeDiv);
     for g = 1:length(Grps)
@@ -324,7 +353,7 @@ for n = 1:length(eMet)
             if isempty(PlotDat)
                 continue
             else
-                eval(['HalfViolinPlot(PlotDat,xt(d),cDiv' num2str(d) ',0.3)']);
+                eval(['HalfViolinPlot(PlotDat,xt(d),cDiv' num2str(d) ', Params.kdeHeight, Params.kdeWidthForOnePoint)']);
             end
             clear DatTemp ValMean ValStd UpperStd LowerStd
             xtlabtext{d} = num2str(AgeDiv(d));
@@ -357,6 +386,12 @@ for n = 1:length(eMet)
             end 
             
         end 
+        
+        if custom_bound_vec(1) == custom_bound_vec(2)
+            fprintf('WARNING: custom bound first value and second value are equal, adding one to deal with this \n')
+            custom_bound_vec(2) = custom_bound_vec(2) + 1;
+        end 
+        
         h(1).YLim = custom_bound_vec;
     end 
 
@@ -364,9 +399,20 @@ for n = 1:length(eMet)
     
     figName = strcat(num2str(n),'_',char(eMetl(n)));
     figPath = fullfile(halfViolinPlotByGroupFolder, figName);
-    pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
+    
+    if Params.showOneFig
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, oneFigureHandle);
+    else
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
+    end
+    
+    
+    if Params.showOneFig
+        clf(oneFigureHandle)
+    else 
+        close(F1);
+    end 
 
-    close(F1)
 end
 
 %% notBoxPlots - plots by DIV
@@ -388,7 +434,16 @@ for n = 1:length(eMet)
 
     all_group_eMet_vals = [];
 
-    F1 = figure;
+    if Params.showOneFig
+        if isgraphics(oneFigureHandle)
+            set(oneFigureHandle, 'Position', p);
+        else 
+            oneFigureHandle = figure;
+        end 
+    else 
+        F1 = figure;
+    end 
+    
     eMeti = char(eMet(n));
     xt = 1:0.5:1+(length(Grps)-1)*0.5;
     for d = 1:length(AgeDiv)
@@ -440,6 +495,12 @@ for n = 1:length(eMet)
                 custom_bound_vec(2) = max(all_group_eMet_vals);
             end 
         end 
+        
+        if custom_bound_vec(1) == custom_bound_vec(2)
+            fprintf('WARNING: custom bound first value and second value are equal, adding one to deal with this \n')
+            custom_bound_vec(2) = custom_bound_vec(2) + 1;
+        end 
+        
         h(1).YLim = custom_bound_vec;
     end 
 
@@ -449,9 +510,20 @@ for n = 1:length(eMet)
 
     figName = strcat(num2str(n),'_',char(eMetl(n)));
     figPath = fullfile(notBoxPlotByDivFolder, figName);
-    pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
-
-    close(F1)
+    
+    if Params.showOneFig
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, oneFigureHandle);
+    else
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
+    end
+    
+    
+    if Params.showOneFig
+        clf(oneFigureHandle)
+    else 
+        close(F1);
+    end 
+    
 end
 
 %% halfViolinPlots - plots by DIV
@@ -470,7 +542,17 @@ p = [100 100 1300 600];
 set(0, 'DefaultFigurePosition', p)
 
 for n = 1:length(eMet)
-    F1 = figure;
+    
+    if Params.showOneFig
+        if isgraphics(oneFigureHandle)
+            set(oneFigureHandle, 'Position', p);
+        else 
+            oneFigureHandle = figure;
+        end 
+    else 
+        F1 = figure;
+    end 
+    
     eMeti = char(eMet(n));
     all_group_eMet_vals = [];
     xt = 1:length(Grps);
@@ -488,7 +570,7 @@ for n = 1:length(eMet)
             if isempty(PlotDat)
                 continue
             else
-                HalfViolinPlot(PlotDat,xt(g), Params.groupColors(g, :), 0.3);
+                HalfViolinPlot(PlotDat,xt(g), Params.groupColors(g, :), 0.3, Params);
             end
             clear DatTemp ValMean ValStd UpperStd LowerStd
             xtlabtext{g} = eGrp;
@@ -521,6 +603,11 @@ for n = 1:length(eMet)
                 custom_bound_vec(2) = max(all_group_eMet_vals);
             end 
         end 
+        
+        if custom_bound_vec(1) == custom_bound_vec(2)
+            fprintf('WARNING: custom bound first value and second value are equal, adding one to deal with this \n')
+            custom_bound_vec(2) = custom_bound_vec(2) + 1;
+        end 
         h(1).YLim = custom_bound_vec;
     end 
 
@@ -530,8 +617,19 @@ for n = 1:length(eMet)
 
     figName = strcat(num2str(n),'_',char(eMetl(n)));
     figPath = fullfile(halfViolinPlotByDivFolder, figName);
-    pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
-    close(F1)
+    
+    if Params.showOneFig
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, oneFigureHandle);
+    else
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
+    end
+    
+    
+    if Params.showOneFig
+        clf(oneFigureHandle)
+    else 
+        close(F1);
+    end 
 end
 
 %% halfViolinPlots - plots by group
@@ -547,7 +645,17 @@ set(0, 'DefaultFigurePosition', p)
 
 allPlotDat = [];
 for n = 1:length(eMet)
-    F1 = figure;
+    
+    if Params.showOneFig
+        if isgraphics(oneFigureHandle)
+            set(oneFigureHandle, 'Position', p);
+        else 
+            oneFigureHandle = figure;
+        end 
+    else 
+        F1 = figure;
+    end 
+    
     eMeti = char(eMet(n));
     xt = 1:length(AgeDiv);
     for g = 1:length(Grps)
@@ -582,12 +690,27 @@ for n = 1:length(eMet)
     set(gca,'TickDir','out');
     set(findall(gcf,'-property','FontSize'),'FontSize',9)
     % set hard lower bound to be zero for firing rate 
-    maxPlotDat = max(PlotDat);
+    if isempty(PlotDat)
+        maxPlotDat = 1;
+    else 
+        maxPlotDat = nanmax(PlotDat);
+    end 
+        
     ylim([0, maxPlotDat])
     figName = strcat(num2str(n),'_',char(eMetl(n)));
     figPath = fullfile(halfViolinPlotNodeByGroupFolder, figName);
-    pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
-    close(F1)
+    
+    if Params.showOneFig
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, oneFigureHandle);
+    else
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
+    end
+    
+    if Params.showOneFig
+        clf(oneFigureHandle)
+    else 
+        close(F1);
+    end 
 end
 
 %% halfViolinPlots - plots by DIV : mean firing rate per electrode 
@@ -603,7 +726,17 @@ set(0, 'DefaultFigurePosition', p)
 all_eMet_vals = [];
 
 for n = 1:length(eMet)
-    F1 = figure;
+    
+    if Params.showOneFig
+        if isgraphics(oneFigureHandle)
+            set(oneFigureHandle, 'Position', p);
+        else 
+            oneFigureHandle = figure;
+        end 
+    else 
+        F1 = figure;
+    end 
+    
     eMeti = char(eMet(n));
     xt = 1:length(Grps);
     for d = 1:length(AgeDiv)
@@ -647,9 +780,18 @@ for n = 1:length(eMet)
     % Export figure
     figName = strcat(num2str(n),'_',char(eMetl(n)));
     figPath = fullfile(halfViolinPlotByNodeDivFolder, figName);
-    pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
-
-    close(F1)
+    
+    if Params.showOneFig
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, oneFigureHandle);
+    else
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
+    end
+    
+    if Params.showOneFig
+        clf(oneFigureHandle)
+    else 
+        close(F1);
+    end 
 end
 
 end

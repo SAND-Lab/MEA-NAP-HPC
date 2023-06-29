@@ -1,5 +1,5 @@
 function plotSpikeDetectionChecks(spikeTimes,spikeDetectionResult,spikeWaveforms, ... 
-    Info,Params, figFolder)
+    Info,Params, figFolder, oneFigureHandle)
 %
 % Make plots to check that spike detection worked properly, and plots
 % spike-related statistics such as the firing rate of each unit / recorded
@@ -25,16 +25,15 @@ function plotSpikeDetectionChecks(spikeTimes,spikeDetectionResult,spikeWaveforms
 %     check plots
 % Returns 
 % -------
-% TODO: how does line 32 work? (seem to assume some file structure 
-% where the raw file is located...
 
 %}
 
 
 %% load raw voltage trace data
-raw_file_name = strcat(Info.FN,'.mat');
+raw_file_name = strcat(Info.FN{1},'.mat');
 
 if isfield(Info, 'rawData')
+    % get the full path of the raw data
     raw_file_name = fullfile(Info.rawData, raw_file_name);
 end 
 
@@ -93,10 +92,10 @@ trace = filtered_data(:, channel);
 p = [100 100 1200 600];
 set(0, 'DefaultFigurePosition', p)
 
-if ~isfield(Params, 'oneFigure')
-     F1 = figure;
+if ~Params.showOneFig
+    F1 = figure;
 else
-    Params.oneFigure.Position = p;
+    set(oneFigureHandle, 'Position', p);
 end 
 
 dSampF = Params.dSampF;
@@ -125,6 +124,7 @@ for i = 1:length(methods)
     %             plot(movmean(spk_vec_all, bin_s*fs), 'linewidth', 2)
     hold on
 end
+
 xticks((duration_s)/(duration_s/60):(duration_s)/(duration_s/60):duration_s)
 xticklabels({'1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17'})
 xlim([0 duration_s])
@@ -133,22 +133,22 @@ xlabel('Time (minutes)');
 ylabel('Spiking frequency (Hz)');
 aesthetics
 set(gca,'TickDir','out');
-title({strcat(regexprep(FN,'_','','emptymatch')),' '});
+title({strcat(regexprep(Info.FN{1},'_','','emptymatch')),' '});
 legend boxoff
 
 % Export figure
 figName = 'SpikeFrequencies';
 figFullPath = fullfile(figFolder, figName);
-if ~isfield(Params, 'oneFigure')
+if ~Params.showOneFig
     pipelineSaveFig(figFullPath, Params.figExt, Params.fullSVG, F1);
 else 
-    pipelineSaveFig(figFullPath, Params.figExt, Params.fullSVG, Params.oneFigure);
+    pipelineSaveFig(figFullPath, Params.figExt, Params.fullSVG, oneFigureHandle);
 end 
 
-if ~isfield(Params, 'oneFigure')
-    close all
+if ~Params.showOneFig 
+    close all 
 else 
-    set(0, 'CurrentFigure', Params.oneFigure);
+    set(0, 'CurrentFigure', oneFigureHandle);
     clf reset
 end 
 
@@ -156,10 +156,10 @@ end
 p = [100 100 1400 800];
 set(0, 'DefaultFigurePosition', p)
 
-if ~isfield(Params, 'oneFigure')
+if ~Params.showOneFig
     F1 = figure;
 else
-    Params.oneFigure.Position = p;
+    set(oneFigureHandle, 'Position', p);
 end 
 
 tiledlayout(5,2,'TileSpacing','Compact');
@@ -225,22 +225,22 @@ hL = legend('Filtered voltage trace', methodsl{:});
 newPosition = [0.6 0.12 0.1 0.1];
 newUnits = 'normalized';
 set(hL,'Position', newPosition,'Units', newUnits,'Box','off');
-title({strcat(regexprep(FN,'_','','emptymatch')),' '});
+title({strcat(regexprep(Info.FN{1},'_','','emptymatch')),' '});
 
 
 % Export figure
 figName = 'ExampleTraces';
 figFullPath = fullfile(figFolder, figName);
-if ~isfield(Params, 'oneFigure')
+if ~Params.showOneFig
     pipelineSaveFig(figFullPath, Params.figExt, Params.fullSVG, F1);
 else 
-    pipelineSaveFig(figFullPath, Params.figExt, Params.fullSVG, Params.oneFigure);
+    pipelineSaveFig(figFullPath, Params.figExt, Params.fullSVG, oneFigureHandle);
 end 
 
-if ~isfield(Params, 'oneFigure')
+if ~Params.showOneFig
     close all
 else 
-    set(0, 'CurrentFigure', Params.oneFigure);
+    set(0, 'CurrentFigure', oneFigureHandle);
     clf reset
 end 
 
@@ -251,14 +251,14 @@ end
 p = [100 100 600 700];
 set(0, 'DefaultFigurePosition', p)
 
-if ~isfield(Params, 'oneFigure')
+if ~Params.showOneFig
     F1 = figure;
 else
-    Params.oneFigure.Position = p;
+    set(oneFigureHandle, 'Position', p);
 end 
 
 t = tiledlayout(2, ceil(length(methods)/2), 'tilespacing','none','padding','none');
-t.Title.String = {strcat(regexprep(FN,'_','','emptymatch')),' ',["Unique spikes by method from electrode " + channel]};
+t.Title.String = {strcat(regexprep(Info.FN{1},'_','','emptymatch')),' ',["Unique spikes by method from electrode " + channel]};
 for i = 1:length(methods)
     method = methods{i};
     if ~strcmp(method, 'all')
@@ -302,16 +302,16 @@ end
 % Export figure
 figName = 'Waveforms';
 figFullPath = fullfile(figFolder, figName);
-if ~isfield(Params, 'oneFigure')
+if ~Params.showOneFig
     pipelineSaveFig(figFullPath, Params.figExt, Params.fullSVG, F1);
 else 
-    pipelineSaveFig(figFullPath, Params.figExt, Params.fullSVG, Params.oneFigure);
+    pipelineSaveFig(figFullPath, Params.figExt, Params.fullSVG, oneFigureHandle);
 end 
 
-if ~isfield(Params, 'oneFigure')
+if ~Params.showOneFig
     close all
 else 
-    set(0, 'CurrentFigure', Params.oneFigure);
+    set(0, 'CurrentFigure', oneFigureHandle);
     clf reset
 end 
 

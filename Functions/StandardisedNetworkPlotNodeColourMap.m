@@ -1,5 +1,5 @@
 function [figureHandle, cb] = StandardisedNetworkPlotNodeColourMap(adjM, coords, edge_thresh, z, zname, z2, z2name, plotType, ...
-                                                   FN, pNum, Params, lagval, e, figFolder)
+                                                   FN, pNum, Params, lagval, e, figFolder, figureHandle)
 % Plots graph network with node size proportional to some node-level variable of
 % choice and color-mapped based on some other node-level variable of choice
 % 
@@ -38,21 +38,16 @@ function [figureHandle, cb] = StandardisedNetworkPlotNodeColourMap(adjM, coords,
 % Updated by Tim Sit
 
 %% plot
-if ~isfield(Params, 'oneFigure')
+p =  [50   100   720  550];
+if exist('figureHandle', 'var')
+    set(figureHandle, 'Position', p);
+elseif ~isfield(Params, 'oneFigure')
     F1 = figure;
-    F1.OuterPosition = [50   100   720  550];
+    F1.OuterPosition = p;
 else 
-    p =  [50   100   720  550];
     set(0, 'DefaultFigurePosition', p)
     % Params.oneFigure.OuterPosition = [50   100   660  550];
     set(Params.oneFigure, 'Position', p);
-end 
-
-if ~isfield(Params, 'oneFigure')
-    close all
-else 
-    set(0, 'CurrentFigure', Params.oneFigure);
-    clf reset
 end 
 
 aesthetics; axis off; hold on
@@ -281,14 +276,16 @@ if strcmp(plotType,'MEA')
             pos = [xc(i)-(0.5*nodeSize) yc(i)-(0.5*nodeSize) nodeSize nodeSize];
             if length(z2) > 1   % deal with z2 is nan due to network size being too small
                 if z2(i)>0
+                    % TODO: there is some subtracting / adding small
+                    % numbers here because ceil() is a bit too sensitive
                     try
                         rectangle('Position',pos,'Curvature',[1 1],'FaceColor', ... 
-                            mycolours(ceil(length(mycolours)*((z2(i)-z2_min)/(z2_max-z2_min))),1:3), ...
+                            mycolours(ceil(length(mycolours)*((z2(i)-z2_min)/(z2_max-z2_min)) - 0.00001),1:3), ...
                             'EdgeColor','w','LineWidth',0.1)
 
                     catch
                         rectangle('Position',pos,'Curvature',[1 1],'FaceColor', ...
-                            mycolours(ceil(length(mycolours)*((z2(i)-z2_min)/(z2_max-z2_min))+0.00001),1:3),'EdgeColor','w','LineWidth',0.1)
+                             mycolours(ceil(length(mycolours)*((z2(i)-z2_min)/(z2_max-z2_min))+0.00001),1:3),'EdgeColor','w','LineWidth',0.1)
                     end
                 else
                     rectangle('Position',pos,'Curvature',[1 1],'FaceColor',mycolours(1,1:3),'EdgeColor','w','LineWidth',0.1)
@@ -424,9 +421,14 @@ if strcmp(plotType,'MEA')
 %     end 
    tickVals = linspace(z2_min, z2_max, num_ticks);
    round_decimal_places = ceil(-log10(z2_max - z2_min)) + 1;
-
-   for tickIndex = 1:num_ticks
-       cbar_ticklabels{tickIndex} = num2str(round(tickVals(tickIndex), round_decimal_places));
+   
+   if min(z2) == 0 && max(z2) == 0
+        % fix for when all values are zeros
+        cbar_ticklabels = {'0', '1'};
+   else
+       for tickIndex = 1:num_ticks
+           cbar_ticklabels{tickIndex} = num2str(round(tickVals(tickIndex), round_decimal_places));
+       end 
    end 
     
     cb.TickLabels = cbar_ticklabels;
@@ -483,8 +485,14 @@ if strcmp(plotType,'circular')
     num_ticks = length(cb.Ticks);
     round_decimal_places = ceil(-log10(max(z2) - min(z2))) + 1;
     tickVals = linspace(min(z2), max(z2), num_ticks);
-    for tickIndex = 1:num_ticks
-        cbar_ticklabels{tickIndex} = num2str(round(tickVals(tickIndex), round_decimal_places));
+    
+    if min(z2) == 0 && max(z2) == 0
+        % fix for when all values are zeros
+        cbar_ticklabels = {'0', '1'};
+    else
+        for tickIndex = 1:num_ticks
+            cbar_ticklabels{tickIndex} = num2str(round(tickVals(tickIndex), round_decimal_places));
+        end 
     end 
     
     cb.TickLabels = cbar_ticklabels;
@@ -497,7 +505,9 @@ figName = strcat([pNum,'_',plotType,'_NetworkPlot',zname,z2name]);
 figName = strrep(figName, ' ', '');
 figPath = fullfile(figFolder, figName);
 
-if ~isfield(Params, 'oneFigure')
+if exist('figureHandle', 'var')
+    pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, figureHandle);
+elseif ~isfield(Params, 'oneFigure')
     pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
 else 
     pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, Params.oneFigure);
@@ -506,7 +516,9 @@ end
 
 
 %  output figure handle 
-if ~isfield(Params, 'oneFigure')
+if exist('figureHandle', 'var')
+    % do nothing
+elseif ~isfield(Params, 'oneFigure')
     figureHandle = F1;
 else 
     figureHandle = Params.oneFigure;

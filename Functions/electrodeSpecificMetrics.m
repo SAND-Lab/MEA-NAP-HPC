@@ -1,4 +1,4 @@
-function [] = electrodeSpecificMetrics(ND, NS, MEW, Eloc, BC, PC, Z, lagval, e, FN, Params, figFolder)
+function [] = electrodeSpecificMetrics(ND, NS, MEW, Eloc, BC, PC, Z, lagval, e, FN, Params, figFolder, oneFigureHandle)
 % Plots electrode-level metrics for individual recordings
 % TODO: allow this to accept arbitrary number of parameters to plot, 
 % this allows easier extensions in the future.
@@ -15,17 +15,17 @@ function [] = electrodeSpecificMetrics(ND, NS, MEW, Eloc, BC, PC, Z, lagval, e, 
 p = [100 100 1400 550];
 set(0, 'DefaultFigurePosition', p)
 
-if ~isfield(Params, 'oneFigure')
+if ~Params.showOneFig
     F1 = figure;
 else 
-    set(Params.oneFigure, 'Position', p);
+    set(oneFigureHandle, 'Position', p);
 end 
 
 % clear figure before plotting
-if ~isfield(Params, 'oneFigure')
+if ~Params.showOneFig
     close all
 else 
-    set(0, 'CurrentFigure', Params.oneFigure);
+    set(0, 'CurrentFigure', oneFigureHandle);
     clf reset
 end 
 
@@ -58,7 +58,7 @@ imshow('BC.png')
 %% half violin plots
 
 nexttile(8,[3,1])
-HalfViolinPlot(ND,1,[0.3 0.3 0.3],0.3)
+HalfViolinPlot(ND,1,[0.3 0.3 0.3], Params.kdeHeight, Params.kdeWidthForOnePoint)
 aesthetics
 set(gca,'TickDir','out');
 set(gca,'xtick',[])
@@ -71,7 +71,7 @@ ylim([0 ND_max + 0.2 * ND_max])
 
 nexttile(9,[3,1])
 if length(MEW) > 1
-    HalfViolinPlot(MEW,1,[0.3 0.3 0.3],0.3)
+    HalfViolinPlot(MEW,1,[0.3 0.3 0.3], Params.kdeHeight, Params.kdeWidthForOnePoint)
 end 
 aesthetics
 set(gca,'TickDir','out');
@@ -84,7 +84,7 @@ max_mew = max([max_mew, 0.1]);
 ylim([0 max_mew+0.2*max_mew])
 
 nexttile(10,[3,1])
-HalfViolinPlot(NS,1,[0.3 0.3 0.3],0.3)
+HalfViolinPlot(NS,1,[0.3 0.3 0.3], Params.kdeHeight, Params.kdeWidthForOnePoint)
 aesthetics
 set(gca,'TickDir','out');
 set(gca,'xtick',[])
@@ -100,7 +100,7 @@ nexttile(11,[3,1])
 
 skipPlot = (numel(Z) == 1) && isnan(Z);
 if ~skipPlot
-    HalfViolinPlot(Z,1,[0.3 0.3 0.3],0.3)
+    HalfViolinPlot(Z,1,[0.3 0.3 0.3], Params.kdeHeight, Params.kdeWidthForOnePoint)
     aesthetics
     set(gca,'TickDir','out');
     set(gca,'xtick',[])
@@ -116,7 +116,7 @@ end
 nexttile(12,[3,1])
 skipPlot = ((numel(Eloc) == 1) && isnan(Eloc)) | (nanmax(Eloc) == 0);
 if ~skipPlot
-    HalfViolinPlot(Eloc,1,[0.3 0.3 0.3],0.3)
+    HalfViolinPlot(Eloc,1,[0.3 0.3 0.3], Params.kdeHeight, Params.kdeWidthForOnePoint)
     aesthetics
     set(gca,'TickDir','out');
     set(gca,'xtick',[])
@@ -130,7 +130,7 @@ end
 nexttile(13,[3,1])
 skipPlot = (numel(PC) == 1) && isnan(PC);
 if ~skipPlot
-    HalfViolinPlot(PC,1,[0.3 0.3 0.3],0.3)
+    HalfViolinPlot(PC,1,[0.3 0.3 0.3], Params.kdeHeight, Params.kdeWidthForOnePoint)
     aesthetics
     set(gca,'TickDir','out');
     set(gca,'xtick',[])
@@ -142,7 +142,7 @@ end
 skipPlot = (numel(BC) == 1) && isnan(BC);
 nexttile(14,[3,1])
 if ~skipPlot
-    HalfViolinPlot(BC,1,[0.3 0.3 0.3],0.3)
+    HalfViolinPlot(BC,1,[0.3 0.3 0.3], Params.kdeHeight, Params.kdeWidthForOnePoint)
     aesthetics
     set(gca,'TickDir','out');
     set(gca,'xtick',[])
@@ -159,10 +159,12 @@ end
 figName = strcat('8_adjM', num2str(lagval(e)),'msGraphMetricsByNode');
 figPath = fullfile(figFolder, figName);
 
-if ~isfield(Params, 'oneFigure')
+if ~Params.showOneFig
     pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
+    close all
 else 
-    pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, Params.oneFigure);
-end 
+    pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, oneFigureHandle);
+    clf(oneFigureHandle)
+end
 
 end
