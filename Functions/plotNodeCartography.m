@@ -1,4 +1,5 @@
-function NetMet = plotNodeCartography(adjMs, Params, NetMet, Info, HomeDir, fileNameFolder, oneFigureHandle)
+function NetMet = plotNodeCartography(adjMs, Params, NetMet, Info, originalCoords, ...
+    originalChannels, HomeDir, fileNameFolder, oneFigureHandle)
 %
 % Parameters
 % ----------
@@ -14,8 +15,6 @@ function NetMet = plotNodeCartography(adjMs, Params, NetMet, Info, HomeDir, file
 % Returns 
 % -------
 
-
-%}
 
 lagval = Params.FuncConLagval;
 edge_thresh = 0.0001;
@@ -50,8 +49,8 @@ for e = 1:length(lagval)
     nodeStrength = sum(adjM, 1);
     inclusionIndex = find(nodeStrength ~= 0);
     adjM = adjM(inclusionIndex, inclusionIndex);
-    coords = Params.coords(inclusionIndex, :);
-    Params.netSubsetChannels = Params.channels(inclusionIndex);
+    coords = originalCoords(inclusionIndex, :);
+    Params.netSubsetChannels = originalChannels(inclusionIndex);
 
 
     [Ci,Q,~] = mod_consensus_cluster_iterate(adjM,0.4,50);
@@ -63,7 +62,7 @@ for e = 1:length(lagval)
 
     % TODO Check if oneFigure object exists here, if not create it again 
     % Params.oneFigure = figure();
-    [NdCartDiv, PopNumNC] = NodeCartography(Z, PC, lagval, e, char(Info.FN), Params, oneFigureHandle); 
+    [NdCartDiv, PopNumNC] = NodeCartography(Z, PC, lagval, e, char(Info.FN), Params, lagFolder, oneFigureHandle); 
 
     PopNumNCt(e,:) = PopNumNC;
     
@@ -85,7 +84,7 @@ for e = 1:length(lagval)
     if aN >= Params.minNumberOfNodesToCalNetMet
         % node cartography in circular plot
         NdCartDivOrd = NdCartDiv(On);
-        StandardisedNetworkPlotNodeCartography(adjM, coords, ... 
+        StandardisedNetworkPlotNodeCartography(adjMord, coords, ... 
             edge_thresh, NdCartDivOrd, 'circular', char(Info.FN), '7', Params, lagval, e, lagFolder, oneFigureHandle)
 
         % node cartography in grid plot 

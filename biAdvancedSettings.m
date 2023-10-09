@@ -5,7 +5,6 @@ if any(isnan(Params.outputDataFolder)) || isempty(Params.outputDataFolder)
     Params.outputDataFolder = HomeDir;
 end 
 %% Spike detection settings
-Params.plotDetectionResults = 0;
 Params.threshold_calculation_window = [0, 1.0];  % which part of the recording to do spike detection, 0 = start of recording, 0.5 = midway, 1 = end of recording
 % params.absThresholds = {''};  % add absolute thresholds here % TODO:
 % double check this works, and allow for this to be empty so it does not have to be commented out 
@@ -66,7 +65,14 @@ option = 'list';
 % low firing rate)
 Params.rasterPlotUpperPercentile = 99;  
 
+%% Burst detection settings 
+Params.networkBurstDetectionMethod = 'Bakkum'; % supported methods: 'Bakkum', 'Manuel', 'LogISI', 'nno'
+Params.minSpikeNetworkBurst = 10;
+Params.minChannelNetworkBurst = 3;
+Params.bakkumNetworkBurstISInThreshold = 'automatic'; % either 'automatic' or a number in seconds
 
+Params.singleChannelBurstDetectionMethod = 'Bakkum'; % supported methods: 'Bakkum'
+Params.singleChannelBurstMinSpike = 10;
 
 %% Dimensionality calculation settings 
 Params.effRankCalMethod = 'covariance';
@@ -112,158 +118,7 @@ Params.kdeWidthForOnePoint = 0;  % bandwidth for KDE (in half violin plots) if t
 %
 Params.includeChannelNumberInPlots = 0;  % whether to plot channel ID in heatmaps and node plots
 
-
-if strcmp(Params.channelLayout, 'MCS60old')
-
-    channels = [11, 12, 13, 14, 15, 16, 17, 18, ... 
-            21, 22, 23, 24, 25, 26, 27, 28, ...
-            31, 32, 33, 34, 35, 36, 37, 38, ...
-            41, 42, 43, 44, 45, 46, 47, 48, ...
-            51, 52, 53, 54, 55, 56, 57, 58, ...
-            61, 62, 63, 64, 65, 66, 67, 68, ...,
-            71, 72, 73, 74, 75, 76, 77, 78, ...,
-            81, 82, 83, 84, 85, 86, 87, 88];
-
-    channelsOrdering = ...
-    [21 31 41 51 61 71 12 22 32 42 52 62 72 82 13 23 33 43 53 63 ... 
-    73 83 14 24 34 44 54 64 74 84 15 25 35 45 55 65 75 85 16 26 ...
-    36 46 56 66 76 86 17 27 37 47 57 67 77 87 28 38 48 58 68 78];
-
-    Params.coords = zeros(length(channels), 2);
-    Params.coords(:, 2) = repmat(linspace(1, 0, 8), 1, 8);
-    Params.coords(:, 1) = repelem(linspace(0, 1, 8), 1, 8);
-
-    subset_idx = find(~ismember(channels, [11, 81, 18, 88]));
-    channels = channels(subset_idx);
-
-    reorderingIdx = zeros(length(channels), 1);
-    for n = 1:length(channels)
-        reorderingIdx(n) = find(channelsOrdering(n) == channels);
-    end 
-    
-    Params.coords = Params.coords(subset_idx, :);
-
-    % Re-order the channel IDs and coordinates to match the original
-    % ordering
-    channels = channels(reorderingIdx);
-    Params.channels = channels; 
-    Params.coords = Params.coords(reorderingIdx, :);
-
-elseif strcmp(Params.channelLayout, 'MCS60')
-
-     channels = [11, 12, 13, 14, 15, 16, 17, 18, ... 
-            21, 22, 23, 24, 25, 26, 27, 28, ...
-            31, 32, 33, 34, 35, 36, 37, 38, ...
-            41, 42, 43, 44, 45, 46, 47, 48, ...
-            51, 52, 53, 54, 55, 56, 57, 58, ...
-            61, 62, 63, 64, 65, 66, 67, 68, ...,
-            71, 72, 73, 74, 75, 76, 77, 78, ...,
-            81, 82, 83, 84, 85, 86, 87, 88];
-
-    channelsOrdering = ...
-    [47, 48, 46, 45, 38, 37, 28, 36, 27, 17, 26, 16, 35, 25, ...
-    15, 14, 24, 34, 13, 23, 12, 22, 33, 21, 32, 31, 44, 43, 41, 42, ...
-    52, 51, 53, 54, 61, 62, 71, 63, 72, 82, 73, 83, 64, 74, 84, 85, 75, ...
-    65, 86, 76, 87, 77, 66, 78, 67, 68, 55, 56, 58, 57];
-
-    Params.coords = zeros(length(channels), 2);
-    Params.coords(:, 2) = repmat(linspace(1, 0, 8), 1, 8);
-    Params.coords(:, 1) = repelem(linspace(0, 1, 8), 1, 8);
-
-    subset_idx = find(~ismember(channels, [11, 81, 18, 88]));
-    channels = channels(subset_idx);
-
-    reorderingIdx = zeros(length(channels), 1);
-    for n = 1:length(channels)
-        reorderingIdx(n) = find(channelsOrdering(n) == channels);
-    end 
-    
-    Params.coords = Params.coords(subset_idx, :);
-
-    % Re-order the channel IDs and coordinates to match the original
-    % ordering
-    channels = channels(reorderingIdx);
-    Params.channels = channels; 
-    Params.coords = Params.coords(reorderingIdx, :);
-    Params.reorderingIdx = reorderingIdx;
-
-elseif strcmp(Params.channelLayout, 'MCS59')
-
-    channels = [11, 12, 13, 14, 15, 16, 17, 18, ... 
-            21, 22, 23, 24, 25, 26, 27, 28, ...
-            31, 32, 33, 34, 35, 36, 37, 38, ...
-            41, 42, 43, 44, 45, 46, 47, 48, ...
-            51, 52, 53, 54, 55, 56, 57, 58, ...
-            61, 62, 63, 64, 65, 66, 67, 68, ...,
-            71, 72, 73, 74, 75, 76, 77, 78, ...,
-            81, 82, 83, 84, 85, 86, 87, 88];
-
-    channelsOrdering = ...
-    [47, 48, 46, 45, 38, 37, 28, 36, 27, 17, 26, 16, 35, 25, ...
-    15, 14, 24, 34, 13, 23, 12, 22, 33, 21, 32, 31, 44, 43, 41, 42, ...
-    52, 51, 53, 54, 61, 62, 71, 63, 72, 82, 73, 83, 64, 74, 84, 85, 75, ...
-    65, 86, 76, 87, 77, 66, 78, 67, 68, 55, 56, 58, 57];
-
-    Params.coords = zeros(length(channels), 2);
-    Params.coords(:, 2) = repmat(linspace(1, 0, 8), 1, 8);
-    Params.coords(:, 1) = repelem(linspace(0, 1, 8), 1, 8);
-
-    subset_idx = find(~ismember(channels, [11, 81, 18, 88]));
-    channels = channels(subset_idx);
-
-    reorderingIdx = zeros(length(channels), 1);
-    for n = 1:length(channels)
-        reorderingIdx(n) = find(channelsOrdering(n) == channels);
-    end 
-    
-    Params.coords = Params.coords(subset_idx, :);
-
-    % Re-order the channel IDs and coordinates to match the original
-    % ordering
-    channels = channels(reorderingIdx);
-    Params.channels = channels; 
-    Params.coords = Params.coords(reorderingIdx, :);
-
-    inclusionIndex = find(channelsOrdering ~= 82);
-    Params.channels = channels(inclusionIndex);
-    Params.coords = Params.coords(inclusionIndex, :);
-    Params.reorderingIdx = reorderingIdx; % (inclusionIndex)
-
-
-elseif strcmp(Params.channelLayout, 'Axion64')
-
-    channels = [11, 12, 13, 14, 15, 16, 17, 18, ... 
-            21, 22, 23, 24, 25, 26, 27, 28, ...
-            31, 32, 33, 34, 35, 36, 37, 38, ...
-            41, 42, 43, 44, 45, 46, 47, 48, ...
-            51, 52, 53, 54, 55, 56, 57, 58, ...
-            61, 62, 63, 64, 65, 66, 67, 68, ...,
-            71, 72, 73, 74, 75, 76, 77, 78, ...,
-            81, 82, 83, 84, 85, 86, 87, 88];
-    Params.coords = zeros(length(channels), 2);
-    Params.coords(:, 2) = repmat(linspace(0, 1, 8), 1, 8);
-    Params.coords(:, 1) = repelem(linspace(0, 1, 8), 1, 8);
-    
-    Params.channels = channels; 
-
-
-elseif strcmp(Params.channelLayout, 'Custom')
-
-    x_min = 0;
-    x_max = 1;
-    y_min = 0;
-    y_max = 1;
-    num_nodes = 64;
-    
-    rand_x_coord = (x_max - x_min) .* rand(num_nodes,1) + x_min;
-    rand_y_coord = (y_max - y_min) .* rand(num_nodes, 1) + y_min; 
-    Params.coords = [rand_x_coord, rand_y_coord];
-
-    Params.coords  = Params.coords * 8;
-
-end 
-
-Params.coords  = Params.coords * 8;  % Do not remove this line after specifying coordinate positions in (0 - 1 format)
+[Params.channels,Params.coords] = getCoordsFromLayout(Params.channelLayout);
 
 %% Plotting : colormap settings 
 % Network plot colormap bounds 
@@ -303,6 +158,8 @@ Params.netMetToCal = {'ND', 'EW', 'NS', 'aN', 'Dens', 'Ci', 'Q', 'nMod', 'Eglob'
         'CC', 'PL' 'SW','SWw' 'Eloc', 'BC', 'PC' , 'PC_raw', 'Cmcblty', 'Z', ...
         'NE', 'effRank', 'num_nnmf_components', 'nComponentsRelNS', ...
         'aveControl', 'modalControl'};
+% Other optional ones: SA_lambda, SA_inf, TA_regional, TA_global
+ 
 Params.excludeEdgesBelowThreshold = 1;
 Params.minNumberOfNodesToCalNetMet = 25;  % minimum number of nodes to calculate BC and other metrics
 Params.networkLevelNetMetToPlot = ...
@@ -364,3 +221,11 @@ Params.includeNMFcomponents = 0;  % whether to save extracted components and ori
 
 % specify whether to include network plots scaled to all recordings 
 Params.includeNetMetScaledPlots = 1;
+
+%% Optional step : statistics and classification 
+Params.pValThreshold = 0.01;  % p value threshold to consider effect as significant
+
+%% Troubleshooting / Diagnostic settings 
+Params.verboseLevel = 'Silent';  % 'Normal', 'High', 'Silent'
+Params.timeProcesses = 1; % whether to log how long each process took
+

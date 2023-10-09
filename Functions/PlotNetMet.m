@@ -109,7 +109,7 @@ NetMetricsC = Params.unitLevelNetMetToPlot;
 %% Import data from all experiments - whole experiment  
 
 experimentMatFileFolder = fullfile(Params.outputDataFolder, ... 
-    strcat('OutputData',Params.Date), 'ExperimentMatFiles');
+    strcat('OutputData',Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
 
 for g = 1:length(Grps)
     % create structure for each group
@@ -246,7 +246,7 @@ end
 
 %% export to spreadsheet (excel or csv)
 
-outputDataFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date));
+outputDataFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNsuffix));
 
 if strcmp(output_spreadsheet_file_type, 'csv')
     % make one main table for storing all data 
@@ -382,7 +382,7 @@ clear DatTemp TempStr
 % Tim 2022-01-08: This seems to be independent of the saved table object (?)
 
 graphMetricByLagFolder = fullfile(Params.outputDataFolder, ... 
-    strcat('OutputData',Params.Date), '4_NetworkActivity', ...
+    strcat('OutputData',Params.Date, Params.NewFNsuffix), '4_NetworkActivity', ...
     '4B_GroupComparisons', '5_GraphMetricsByLag');
 
 eMet = Params.networkLevelNetMetToPlot;
@@ -507,8 +507,8 @@ end
 
 %% notBoxPlots - plots by group
 if Params.includeNotBoxPlots 
-    networkNotBoxPlotFolder = fullfile(Params.outputDataFolder, ...
-        strcat('OutputData',Params.Date), '4_NetworkActivity', ...
+     networkNotBoxPlotFolder = fullfile(Params.outputDataFolder, ...
+        strcat('OutputData',Params.Date, Params.NewFNsuffix), '4_NetworkActivity', ...
         '4B_GroupComparisons', '3_RecordingsByGroup', 'NotBoxPlots');
 
     eMet = Params.networkLevelNetMetToPlot;
@@ -618,7 +618,7 @@ end
 %% halfViolinPlots - plots by group
 
 halfViolinPlotByGroupFolder = fullfile(Params.outputDataFolder, ... 
-    strcat('OutputData',Params.Date), '4_NetworkActivity', ...
+    strcat('OutputData',Params.Date, Params.NewFNsuffix), '4_NetworkActivity', ...
     '4B_GroupComparisons', '3_RecordingsByGroup', 'HalfViolinPlots');
 
 eMet = Params.networkLevelNetMetToPlot;
@@ -662,9 +662,9 @@ for l = 1:length(Params.FuncConLagval)
                     DatTemp = zeros(1, length(Params.FuncConLagval));
                 end 
                 
-                
                 PlotDat = DatTemp(:,l);
                 PlotDat(isnan(PlotDat)) = [];
+                PlotDat(~isfinite(PlotDat)) = [];
                 if isempty(PlotDat)
                     continue
                 else
@@ -731,8 +731,8 @@ end
 
 %% notBoxPlots - plots by DIV
 if Params.includeNotBoxPlots 
-    notBoxPlotByDivFolder = fullfile(Params.outputDataFolder, ...
-        strcat('OutputData',Params.Date), '4_NetworkActivity', '4B_GroupComparisons', ...
+       notBoxPlotByDivFolder = fullfile(Params.outputDataFolder, ...
+        strcat('OutputData',Params.Date, Params.NewFNsuffix), '4_NetworkActivity', '4B_GroupComparisons', ...
         '4_RecordingsByAge', 'NotBoxPlots');
 
     eMet = Params.networkLevelNetMetToPlot;
@@ -819,7 +819,7 @@ end
 
 %% halfViolinPlots - plots by DIV
 
-halfViolinPlotByDivFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date), ...
+halfViolinPlotByDivFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNsuffix), ...
     '4_NetworkActivity', '4B_GroupComparisons', '4_RecordingsByAge', 'HalfViolinPlots');
 
 eMet = Params.networkLevelNetMetToPlot;
@@ -866,6 +866,7 @@ for l = 1:length(Params.FuncConLagval)
                 end 
                 PlotDat = DatTemp(:,l);
                 PlotDat(isnan(PlotDat)) = [];
+                PlotDat(~isfinite(PlotDat)) = [];
                 if (1 - isempty(PlotDat))
                     HalfViolinPlot(PlotDat, xt(g), Params.groupColors(g, :), Params.kdeHeight, Params.kdeWidthForOnePoint);
                 end
@@ -935,7 +936,7 @@ end
    
 %% halfViolinPlots - plots by group electrode specific data
 
-nodeByGroupFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date), ...
+nodeByGroupFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNsuffix), ...
     '4_NetworkActivity', '4B_GroupComparisons', '1_NodeByGroup');
 
 eMet = Params.unitLevelNetMetToPlot; 
@@ -972,6 +973,7 @@ for l = 1:length(Params.FuncConLagval)
                 end 
                 PlotDat = DatTemp(:,l);
                 PlotDat(isnan(PlotDat)) = [];
+                PlotDat(~isfinite(PlotDat)) = [];
                 if isempty(PlotDat)
                     continue
                 else
@@ -1014,7 +1016,7 @@ end
 
 %% halfViolinPlots - plots by DIV electrode specific data
 
-halfViolinPlotByAgeFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date), ...
+halfViolinPlotByAgeFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNsuffix), ...
     '4_NetworkActivity', '4B_GroupComparisons', '2_NodeByAge');
 
 eMet = Params.unitLevelNetMetToPlot; 
@@ -1054,6 +1056,7 @@ for l = 1:length(Params.FuncConLagval)
                 end 
                 PlotDat = DatTemp(:,l);
                 PlotDat(isnan(PlotDat)) = [];
+                PlotDat(~isfinite(PlotDat)) = [];
                 if isempty(PlotDat)
                     continue
                 else

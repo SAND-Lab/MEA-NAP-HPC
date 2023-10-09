@@ -1,4 +1,4 @@
-function [NetMet] = ExtractNetMet(adjMs, spikeTimes, lagval,Info,HomeDir,Params, spikeMatrix, oneFigureHandle)
+function [NetMet] = ExtractNetMet(adjMs, spikeTimes, lagval,Info,HomeDir,Params, spikeMatrix, originalCoords, channels, oneFigureHandle)
 %
 % Extract network metrics from adjacency matrices for organoid data
 % 
@@ -17,6 +17,8 @@ function [NetMet] = ExtractNetMet(adjMs, spikeTimes, lagval,Info,HomeDir,Params,
 %             in and out whilst the code is running the background)
 %         coords : N X 2 matrix 
 %            the coordinates of each network 
+% coords : 
+% channels : 
 % 
 % spikeMatrix : (N x T sparse or full matrix)
 % 
@@ -128,8 +130,8 @@ for e = 1:length(lagval)
     nodeStrength = sum(adjM, 1);
     inclusionIndex = find(nodeStrength ~= 0);
     adjM = adjM(inclusionIndex, inclusionIndex);
-    coords = Params.coords(inclusionIndex, :);
-    Params.netSubsetChannels = Params.channels(inclusionIndex);
+    coords = originalCoords(inclusionIndex, :);
+    Params.netSubsetChannels = channels(inclusionIndex);
     
     %% node degree, edge weight, node strength
     if Params.excludeEdgesBelowThreshold 
@@ -209,7 +211,8 @@ for e = 1:length(lagval)
         ITER = 5000;
         [R, ~,met2] = randmio_und_v2(adjM, ITER,'SW');
     
-        plotNullModelIterations(met, met2, lagval, e, char(Info.FN), Params, oneFigureHandle)
+        plotNullModelIterations(met, met2, lagval, e, char(Info.FN), ...
+            Params, lagFolderName, oneFigureHandle)
     
         %% Calculate network metrics (+normalization).
         
@@ -405,6 +408,20 @@ else
         NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).modalControlMean = modalControlMean;
         NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).modalControlPrctLessThanThreshold = modalControlPrctLessThanThreshold;
     end 
+    
+    
+    %% Spatial and Temporal autocorrelation 
+    if any(strcmp(netMetToCal, 'SA_lambda')) || any(strcmp(netMetToCal, 'SA_inf'))
+        dist = squareform(pdist(coords));
+        cm = adjM;
+        discretization = 15;  % arbitrary number to get good number of samples per bin
+        [SA_lambda, SA_inf] = spatial_autocorrelation(dist, cm, discretization);
+    end 
+    
+    if any(strcmp(netMetToCal, 'TA_regional')) || any(strcmp(netMetToCal, 'TA_global'))
+        % TODO: calculate temporal autocorrelatio
+    end 
+    
 
     
     %% reassign to structures
