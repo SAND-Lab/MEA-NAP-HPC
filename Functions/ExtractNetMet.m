@@ -1,6 +1,5 @@
 function [NetMet] = ExtractNetMet(adjMs, spikeTimes, lagval,Info,HomeDir,Params, spikeMatrix, originalCoords, channels, oneFigureHandle)
-%
-% Extract network metrics from adjacency matrices for organoid data
+% EXTRACTNETMET Extract network metrics from adjacency matrices 
 % 
 % Parameters 
 % ----------
@@ -17,9 +16,10 @@ function [NetMet] = ExtractNetMet(adjMs, spikeTimes, lagval,Info,HomeDir,Params,
 %             in and out whilst the code is running the background)
 %         coords : N X 2 matrix 
 %            the coordinates of each network 
-% coords : 
-% channels : 
-% 
+% coords : N x 2 matrix
+%       spatial coordinates of the channels
+% channels : N x 1 vector
+%       channel numbering (for visualisation purpopse)
 % spikeMatrix : (N x T sparse or full matrix)
 % 
 % Returns
@@ -30,26 +30,25 @@ function [NetMet] = ExtractNetMet(adjMs, spikeTimes, lagval,Info,HomeDir,Params,
 %     'ND' : Node degree
 %     'EW' : mean edge weight of each node
 %     'NS' : Node strength
-%     'aN' : 
-%     'Dens' : 
-%     'Ci' :
-%     'Q' :  
-%     'nMod' : 
-%     'Eglob' : 
-%     'CC' :  
-%     'PL' : 
-%     'SW' : 
-%     'SWw' :
-%     'Eloc' :
-%     'BC' : 
-%     'PC' :  
-%     'PC_raw' :
-%     'Cmcblty' : 
-%     'Z' : 
-%     'Hub4' : 
-%     'Hub3' : 
-%     'NE' : 
-% 
+%     'aN' : Number of active nodes
+%     'Dens' : Density
+%     'Ci' : Community affiliation vector
+%     'Q' : Moudality index
+%     'nMod' : Number of modules
+%     'Eglob' : Global efficiency
+%     'CC' :  Clustering Coefficient
+%     'PL' : Mean path length
+%     'SW' : Small-worldness sigma coefficient
+%     'SWw' : Small-wordlness omega coefficient
+%     'Eloc' : Local efficiency
+%     'BC' : Betwenness Centrality
+%     'PC' : Participation Coefficient with normalization
+%     'PC_raw' : Participation Coefficient without normalization
+%     'Cmcblty' : Communicability
+%     'Z' : Within-module z-score
+%     'Hub4' : Number of hubs satisfying all 4 of the hub criteria
+%     'Hub3' : Number of hubs satisfying 3 out of 4 of the hub criteria
+%     'NE' : Nodal efficiency
 % 
 % % List of plotting functions used in this script: 
 %     - plotConnectivityProperties
@@ -144,10 +143,6 @@ for e = 1:length(lagval)
     
     % Node strength
     NS = strengths_und(adjM)';
-    
-    % Tim 2021-12-02: Actually strengths_und is just the sum for each node?
-    % If you are using the function here: https://github.com/eglerean/NBEHBC/blob/master/code/external/BCT/2017_01_15_BCT/strengths_und.m
-    % NS = sum(adjM)'; 
     
     % plot properties
     plotConnectivityProperties(adjM, e, lagval, maxSTTC, meanSTTC, ...
@@ -246,17 +241,17 @@ for e = 1:length(lagval)
         
         BC95thpercentile = prctile(BC, 95);
         BCmeantop5 = mean(BC(BC >= BC95thpercentile));
-else
-     fprintf('Not enough nodes to calculate network metrics! \n')
-     SW = nan;
-     SWw = nan;
-     CC = nan;
-     PL = nan;
-     Eloc = nan;
-     ElocMean = nan;
-     BC = nan;
-     BCmeantop5 = nan;
- end
+    else
+         fprintf('Not enough nodes to calculate network metrics! \n')
+         SW = nan;
+         SWw = nan;
+         CC = nan;
+         PL = nan;
+         Eloc = nan;
+         ElocMean = nan;
+         BC = nan;
+         BCmeantop5 = nan;
+     end
     
     % participation coefficient
 %     PC = participation_coef(adjM,Ci,0);
@@ -361,30 +356,40 @@ else
     end 
 
     %% Calculate non-negative matrix factorisation components
-    if any(strcmp(netMetToCal, 'num_nnmf_components'))
-        fprintf('Calculating NMF \n')
-        minSpikeCount = 10;
-        includeRandomMatrix = 1;
-        nmfCalResults = calNMF(spikeMatrix, Params.fs, Params.NMFdownsampleFreq, ...
-                                Info.duration_s, minSpikeCount, includeRandomMatrix, ...
-                                Params.includeNMFcomponents);
-        NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).num_nnmf_components = nmfCalResults.num_nnmf_components;
-        NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).nComponentsRelNS = nmfCalResults.nComponentsRelNS; 
-        if Params.includeNMFcomponents
-            NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).nmfFactors = nmfCalResults.nmfFactors;
-            NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).nmfWeights = nmfCalResults.nmfWeights;
-            NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).downSampleSpikeMatrix = nmfCalResults.downSampleSpikeMatrix;
+    % note these are only calcualted for the first lag field because they
+    % do not depend on lag
+    if e == 1
+        if any(strcmp(netMetToCal, 'num_nnmf_components'))
+            fprintf('Calculating NMF \n')
+            minSpikeCount = 10;
+            includeRandomMatrix = 1;
+            nmfCalResults = calNMF(spikeMatrix, Params.fs, Params.NMFdownsampleFreq, ...
+                                    Info.duration_s, minSpikeCount, includeRandomMatrix, ...
+                                    Params.includeNMFcomponents);
+            NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).num_nnmf_components = nmfCalResults.num_nnmf_components;
+            NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).nComponentsRelNS = nmfCalResults.nComponentsRelNS; 
+            NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).nnmf_residuals = nmfCalResults.nnmf_residuals; 
+            NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).nnmf_var_explained = nmfCalResults.nnmf_var_explained;
+            NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).randResidualPerComponent = nmfCalResults.randResidualPerComponent;
+            if Params.includeNMFcomponents
+                NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).nmfFactors = nmfCalResults.nmfFactors;
+                NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).nmfWeights = nmfCalResults.nmfWeights;
+                NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).downSampleSpikeMatrix = nmfCalResults.downSampleSpikeMatrix;
+                NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).nmfFactorsVarThreshold = nmfCalResults.nmfFactorsVarThreshold;
+                NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).nmfWeightsVarThreshold = nmfCalResults.nmfWeightsVarThreshold;
+            end 
+
         end 
 
+        %% Calculate effective rank 
+        if any(strcmp(netMetToCal,'effRank'))
+            fprintf('Calculating effective rank \n')
+            downSampleMatrix = downSampleSum(full(spikeMatrix), Params.effRankDownsampleFreq * Info.duration_s);
+            NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).effRank = ...
+                calEffRank(downSampleMatrix, Params.effRankCalMethod);
+        end 
+        
     end 
-
-    %% Calculate effective rank 
-    if any(strcmp(netMetToCal,'effRank'))
-        fprintf('Calculating effective rank \n')
-        NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).effRank = ...
-            calEffRank(spikeMatrix, Params.effRankCalMethod);
-    end 
-
     %% Calculate average and modal controllability 
     if any(strcmp(netMetToCal, 'aveControl'))
         aveControl = ave_control(adjM);
@@ -419,7 +424,14 @@ else
     end 
     
     if any(strcmp(netMetToCal, 'TA_regional')) || any(strcmp(netMetToCal, 'TA_global'))
-        % TODO: calculate temporal autocorrelatio
+        % TODO: calculate temporal autocorrelation
+        time_bin_size = 0.1; % in units of seconds 
+        spikeMatrixBinned = 1; % TODO: resample spike matrix
+        lag_corr_per_channel = zeros(length(inclusionIndex), 1);
+        for channel = 1:size(spikeMatrix, 1)
+            x = spikeMatrix(inclusionIndex, :);
+            lag_corr_per_channel = temporal_autocorrelation(x);
+        end
     end 
     
 

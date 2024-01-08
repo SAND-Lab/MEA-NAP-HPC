@@ -95,7 +95,12 @@ set(0, 'DefaultFigurePosition', p)
 if ~Params.showOneFig
     F1 = figure;
 else
-    set(oneFigureHandle, 'Position', p);
+    if isgraphics(oneFigureHandle)
+        set(oneFigureHandle, 'Position', p);
+    else 
+        oneFigureHandle = figure;
+        set(oneFigureHandle, 'Position', p);
+    end 
 end 
 
 dSampF = Params.dSampF;
@@ -120,7 +125,7 @@ for i = 1:length(methods)
     spike_freq.(method) = spike_count/duration_s;
     spk_matrix_all.(method) = spk_matrix;
     down_spk_matrix_all = mean(spk_matrix,1);
-    plot(down_spk_matrix_all, 'linewidth', 2)
+    plot(down_spk_matrix_all, 'linewidth', 2, 'color', Params.spikeMethodColors(i, :))
     %             plot(movmean(spk_vec_all, bin_s*fs), 'linewidth', 2)
     hold on
 end
@@ -173,8 +178,6 @@ for l = 1:numExampleTraces
     trace = filtered_data(:, channel);
     
     nexttile
-    cmap = jet;
-    colors = round(linspace(1,256,length(methods)));
     plot(trace, 'k-')
     hold on
     
@@ -188,11 +191,10 @@ for l = 1:numExampleTraces
                 spike_train = spike_train * fs/1000;
             case 'frames'
         end
-        color = parula(colors(m));
         scatter(spike_train, repmat(5*std(trace)-m*(0.5*std(trace)), ...
             length(spike_train), 1), 15, 'v', 'filled', ... 
-            'markerfacecolor',cmap(colors(m),:), ... 
-            'markeredgecolor', cmap(colors(m),:), 'linewidth',0.1);
+            'markerfacecolor',Params.spikeMethodColors(m, :), ... 
+            'markeredgecolor', Params.spikeMethodColors(m, :), 'linewidth',0.1);
     end
     methodsl = strrep(methods, 'p','.');
     

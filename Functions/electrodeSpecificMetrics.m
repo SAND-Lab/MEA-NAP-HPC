@@ -120,7 +120,7 @@ if ~skipPlot
     aesthetics
     set(gca,'TickDir','out');
     set(gca,'xtick',[])
-    ylabel('local connectivity') 
+    ylabel('local efficiency') 
     if length(unique(Eloc)) ~= 1
         ylim([0 nanmax(Eloc)+0.2*nanmax(Eloc)])
     end 
@@ -135,7 +135,10 @@ if ~skipPlot
     set(gca,'TickDir','out');
     set(gca,'xtick',[])
     ylabel('participation coefficient')
-    ylim([0 nanmax(PC)+0.2*nanmax(PC)])
+    max_possible_pc = 1;
+    y_bound_suggestion = 1.2 * nanmax(PC);
+    y_max = min([y_bound_suggestion, max_possible_pc]);
+    ylim([0 y_max])
 end 
 
 % Plot betweeness centrality 
@@ -146,7 +149,7 @@ if ~skipPlot
     aesthetics
     set(gca,'TickDir','out');
     set(gca,'xtick',[])
-    ylabel('betweeness centrality')
+    ylabel('betweenness centrality')
     if nanmin(BC) == nanmax(BC)
         ylim([0, nanmax(BC) + 0.1])  % handle edge case of eg. all zeros
     else
@@ -156,7 +159,7 @@ end
 
 
 %% save figure
-figName = strcat('8_adjM', num2str(lagval(e)),'msGraphMetricsByNode');
+figName = strcat('7_adjM', num2str(lagval(e)),'msGraphMetricsByNode');
 figPath = fullfile(figFolder, figName);
 
 if ~Params.showOneFig

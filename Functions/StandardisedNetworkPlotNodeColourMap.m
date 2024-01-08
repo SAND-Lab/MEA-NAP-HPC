@@ -1,5 +1,5 @@
 function [figureHandle, cb] = StandardisedNetworkPlotNodeColourMap(adjM, coords, edge_thresh, z, zname, z2, z2name, plotType, ...
-                                                   FN, pNum, Params, lagval, e, figFolder, figureHandle)
+                                                   FN, pNum, Params, lagval, e, figFolder, figureHandle, saveFigure)
 % Plots graph network with node size proportional to some node-level variable of
 % choice and color-mapped based on some other node-level variable of choice
 % 
@@ -18,7 +18,7 @@ function [figureHandle, cb] = StandardisedNetworkPlotNodeColourMap(adjM, coords,
 %     name of the z network metric
 %   z2 : str
 %     the network metric used to determine the colour of the plotted
-%      nodes, eg: betweeness centrality or participation coefficient
+%      nodes, eg: betweenness centrality or participation coefficient
 %   z2name : str
 %     name of the z2 network metric
 %   plotType : str
@@ -36,6 +36,11 @@ function [figureHandle, cb] = StandardisedNetworkPlotNodeColourMap(adjM, coords,
 %
 % author RCFeord August 2021
 % Updated by Tim Sit
+
+if ~exist('saveFigure', 'var')
+    saveFigure = 1;
+end 
+
 
 %% plot
 p =  [50   100   720  550];
@@ -64,7 +69,7 @@ yc = coords(:,2);
 % metric names
 % TODO: find a more streamlined way to do this
 z2nameToShortHand = containers.Map;
-z2nameToShortHand('Betweeness centrality') = 'BC';
+z2nameToShortHand('Betweenness centrality') = 'BC';
 z2nameToShortHand('Participation coefficient') = 'PC';
 z2nameToShortHand('Local efficiency') = 'Eloc';
 z2nameToShortHand('Average controllability') = 'aveControl';
@@ -248,7 +253,7 @@ end
 
 % Theoretical bounds currently takes prescedence over using minMax bounds
 % for colors
-if Params.use_theoretical_bounds
+if Params.use_custom_bounds
     cmap_bounds = Params.network_plot_cmap_bounds.(z2nameToShortHand(z2name));
     z2_min = cmap_bounds(1);
     z2_max = cmap_bounds(end);
@@ -332,6 +337,12 @@ if strcmp(plotType,'circular')
                 end
             else
                 rectangle('Position',pos,'Curvature',[1 1],'FaceColor',mycolours(1,1:3),'EdgeColor','w','LineWidth',0.1)
+            end
+            
+            % add channel number 
+            if Params.includeChannelNumberInPlots 
+                text(pos(1), pos(2), sprintf('%.f', Params.netSubsetChannels(i)), ...
+                'HorizontalAlignment','center')
             end
         end
     end
@@ -505,13 +516,15 @@ figName = strcat([pNum,'_',plotType,'_NetworkPlot',zname,z2name]);
 figName = strrep(figName, ' ', '');
 figPath = fullfile(figFolder, figName);
 
-if exist('figureHandle', 'var')
-    pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, figureHandle);
-elseif ~isfield(Params, 'oneFigure')
-    pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
-else 
-    pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, Params.oneFigure);
-end 
+if saveFigure
+    if exist('figureHandle', 'var')
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, figureHandle);
+    elseif ~isfield(Params, 'oneFigure')
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, F1);
+    else 
+        pipelineSaveFig(figPath, Params.figExt, Params.fullSVG, Params.oneFigure);
+    end 
+end
 
 
 

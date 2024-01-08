@@ -41,7 +41,7 @@ NetMetricsC = Params.unitLevelNetMetToPlot;
 % and put them on separate tables 
 
 experimentMatFolderPath = fullfile(Params.outputDataFolder, ...
-        strcat('OutputData',Params.Date,Params.NewFNsuffix), 'ExperimentMatFiles');
+        strcat('OutputData',Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
 
 allRecordingLevelData = struct();
 allElectrodeLevelData = struct();
@@ -74,12 +74,13 @@ for i = 1:length(ExpName)
      allRecordingLevelData.Lag = [allRecordingLevelData.Lag; Params.FuncConLagval'];
      
      % add to electrode level data 
-
+     lagIndependentMets = {'effRank', 'num_nnmf_components', 'nComponentsRelNS'}; 
+     firstLagField = strcat('adjM', num2str(Params.FuncConLagval(1)), 'mslag');
      % recording level data 
      for e = 1:length(NetMetricsE)
          eMet = cell2mat(NetMetricsE(e));
          
-         if i == 1
+         if (i == 1) && (contains(eMet, fieldnames(expData.('NetMet').(firstLagField))) || contains(eMet, lagIndependentMets))
              allRecordingLevelData.(eMet) = [];
          end 
          
@@ -105,7 +106,13 @@ for i = 1:length(ExpName)
      
             end 
             
-            allRecordingLevelData.(eMet) = [allRecordingLevelData.(eMet); expData.('NetMet').(lagField).(eMet)];
+            if contains(eMet, lagIndependentMets)
+                % 'effRank', 'num_nnmf_components', 'nComponentsRelNS'
+                firstLagField = sprintf('adjM%.fmslag', Params.FuncConLagval(1));
+                allRecordingLevelData.(eMet) = [allRecordingLevelData.(eMet); expData.('NetMet').(firstLagField).(eMet)];
+            elseif contains(eMet, fieldnames(expData.('NetMet').(lagField)))
+                allRecordingLevelData.(eMet) = [allRecordingLevelData.(eMet); expData.('NetMet').(lagField).(eMet)];
+            end 
          end 
      end 
      

@@ -1,8 +1,19 @@
 function plotElectrodeLayout(HomeDir, Params, oneFigureHandle)
 %PLOTELECTRODELAYOUT Plots the layout of the electrodes specified in Params
-%   Detailed explanation goes here
+% Parameters 
+% ----------
+% HomeDir : str 
+% Params : struct 
+% oneFigureHandle : figure handle object
+% -----------
+% NOTE: for datasets with multiple layouts, this function currently plots 
+% only the layout from the first data file
 
-num_channels = size(Params.coords, 1);
+if iscell(Params.coords)
+    num_channels = size(Params.coords{1}, 1);
+else
+    num_channels = size(Params.coords, 1);
+end
 p = [100 100 1400 550];
 if Params.showOneFig 
     if ~isgraphics(oneFigureHandle)
@@ -20,7 +31,6 @@ end
 subplot(1, 2, 1)
 title('Provided electrode layout (channel index)')
 
-% TODO: currently only plots first layout, should plot unique layouts
 for n_channel = 1:num_channels
     txt_to_plot = sprintf('%.f', n_channel);
     if iscell(Params.coords)
@@ -65,7 +75,7 @@ end
 set(gcf, 'color', 'w')
 
 % save figure
-figFolder = fullfile(HomeDir, strcat(['OutputData', Params.Date, Params.NewFNsuffix]));
+figFolder = fullfile(HomeDir, strcat(['OutputData', Params.Date, Params.NewFNSuffix]));
 figName = 'channel_layout';
 figSavePath = fullfile(figFolder, figName);
 

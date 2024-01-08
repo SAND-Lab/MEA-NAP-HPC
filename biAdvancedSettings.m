@@ -64,6 +64,14 @@ option = 'list';
 % 99 : prevent outliers dominating the plot, 100 : scale to the max (for
 % low firing rate)
 Params.rasterPlotUpperPercentile = 99;  
+Params.spikeMethodColors = ...
+    [  0    0.4470    0.7410; ...
+    0.8500    0.3250    0.0980; ...
+    0.9290    0.6940    0.1250; ...
+    0.4940    0.1840    0.5560; ... 
+    0.4660    0.6740    0.1880; ... 
+    0.3010    0.7450    0.9330; ... 
+    0.6350    0.0780    0.1840];
 
 %% Burst detection settings 
 Params.networkBurstDetectionMethod = 'Bakkum'; % supported methods: 'Bakkum', 'Manuel', 'LogISI', 'nno'
@@ -76,8 +84,8 @@ Params.singleChannelBurstMinSpike = 10;
 
 %% Dimensionality calculation settings 
 Params.effRankCalMethod = 'covariance';
-Params.NMFdownsampleFreq = 10;   % how mucn to downsample the spike matrix to (Hz) before doing non-negative matrix factorisation
-
+Params.NMFdownsampleFreq = 10;   % how much to downsample the spike matrix to (Hz) before doing non-negative matrix factorisation
+Params.effRankDownsampleFreq = 10; % how much to downsample the spike matrix to (Hz) before doing effective rank calculation 
 %% Node cartography settings 
 Params.hubBoundaryWMdDeg = 0.25; % boundary that separates hub and non-hubs (default 2.5)
 Params.periPartCoef = 0.525; % boundary that separates peripheral node and none-hub connector (default: 0.625)
@@ -122,11 +130,11 @@ Params.includeChannelNumberInPlots = 0;  % whether to plot channel ID in heatmap
 
 %% Plotting : colormap settings 
 % Network plot colormap bounds 
-Params.use_theoretical_bounds = 0;
+Params.use_custom_bounds = 0;
 Params.use_min_max_all_recording_bounds = 0;
 Params.use_min_max_per_genotype_bounds = 0;
 
-if Params.use_theoretical_bounds
+if Params.use_custom_bounds
     network_plot_cmap_bounds = struct();
     network_plot_cmap_bounds.CC = [0, 1];
     network_plot_cmap_bounds.PC = [0, 1];
@@ -144,6 +152,9 @@ else
 
     end 
 end 
+
+% Raster colormap 
+Params.rasterColormap = 'parula';  % 'parula' or 'gray'
 
 %% Plotting : ordering of groups for statistical summary plots 
 % Params.customGrpOrder = {'WT', 'HE', 'KO'} ; % eg. {'WT', 'HE', 'KO'};  % leave as empty {} if to use default alphabetical order
@@ -171,13 +182,13 @@ Params.networkLevelNetMetToPlot = ...
     'NSmean', 'ElocMean', ... 
     'PCmean', 'PCmeanTop10', 'PCmeanBottom10', ...
     'percentZscoreGreaterThanZero', 'percentZscoreLessThanZero', ...
-    };  % which network metric to plot at the network level 
+    'NCpn1','NCpn2','NCpn3','NCpn4','NCpn5','NCpn6'};  % which network metric to plot at the network level 
 Params.networkLevelNetMetLabels = {
     'network size', ... 
     'density','clustering coefficient', ...
     'number of modules', ... 
     'modularity score', ...
-    'path length', ...
+    'mean path length', ...
     'global efficiency', ...
     'small worldness \sigma', ... 
     'small worldness \omega', ...
@@ -188,7 +199,7 @@ Params.networkLevelNetMetLabels = {
     'Node strength mean', 'Local efficiency mean', ... 
     'Participant coefficient (PC) mean', 'Top 10% PC', 'Bottom 10% PC', ... 
     'Percentage within-module z-score > 0', 'Percentage within-module z-score < 0', ...
-    };
+    'NCpn1','NCpn2','NCpn3','NCpn4','NCpn5','NCpn6'};
 Params.networkLevelNetMetCustomBounds = struct();
 
 % Set custom axis limits that matches with what can theoretically be
@@ -198,11 +209,12 @@ Params.networkLevelNetMetCustomBounds.('Dens') = [0, 1];  % density
 Params.networkLevelNetMetCustomBounds.('num_nnmf_components') = [1, nan];
 Params.networkLevelNetMetCustomBounds.('aveControl') = [1, 1.5];
 Params.networkLevelNetMetCustomBounds.('modalControl') = [0.6, 1];
-Params.networkLevelNetMetCustomBounds.('ND') = [0, length(Params.channels) -1];
-Params.networkLevelNetMetCustomBounds.('Eloc') = [0, nan];
-Params.networkLevelNetMetCustomBounds.('EW') = [0, nan];
+Params.networkLevelNetMetCustomBounds.('ND') = [0, (length(Params.channels) - 1)];
+Params.networkLevelNetMetCustomBounds.('Eloc') = [0, 1];
+Params.networkLevelNetMetCustomBounds.('EW') = [0, 1];
 Params.networkLevelNetMetCustomBounds.('NS') = [0, nan];
 Params.networkLevelNetMetCustomBounds.('BC') = [0, 1];
+Params.networkLevelNetMetCustomBounds.('PC') = [0, 1];
 Params.networkLevelNetMetCustomBounds.('CC') = [0, nan];
 Params.networkLevelNetMetCustomBounds.('nMod') = [0, nan];
 Params.networkLevelNetMetCustomBounds.('Q') = [0, nan];
@@ -210,22 +222,33 @@ Params.networkLevelNetMetCustomBounds.('PL') = [0, nan];
 Params.networkLevelNetMetCustomBounds.('Eglob') = [0, 1];
 Params.networkLevelNetMetCustomBounds.('effRank') = [1, length(Params.channels)];
 Params.networkLevelNetMetCustomBounds.('nComponentsRelNS') = [0, 1];
+Params.networkLevelNetMetCustomBounds.('NDmean') = [0, nan];
+Params.networkLevelNetMetCustomBounds.('NDtop25') = [0, nan];
+Params.networkLevelNetMetCustomBounds.('sigEdgesMean') = [0, nan];
+Params.networkLevelNetMetCustomBounds.('sigEdgesTop10') = [0, nan];
+Params.networkLevelNetMetCustomBounds.('NSmean') = [0, nan];
+Params.networkLevelNetMetCustomBounds.('ElocMean') = [0, 1];
+Params.networkLevelNetMetCustomBounds.('PCmean') = [0, 1];
+Params.networkLevelNetMetCustomBounds.('PCmeanTop10') = [0, 1];
+Params.networkLevelNetMetCustomBounds.('PCmeanBottom10') = [0, 1];
 
-Params.unitLevelNetMetToPlot = {'ND','MEW','NS','Z','Eloc','PC','BC', 'aveControl', 'modalControl'};
+Params.lagIndependentMets = {'effRank', 'num_nnmf_components', 'nComponentsRelNS'};
+
+Params.unitLevelNetMetToPlot = {'ND','MEW','NS','Z','Eloc','PC','BC'};
+% 'aveControl', 'modalControl'
 Params.unitLevelNetMetLabels = {'node degree','edge weight','node strength', ... 
     'within-module degree z-score', ... 
-    'local efficiency','participation coefficient','betweeness centrality', ...
-    'average controllability', 'modal controllability'}; 
+    'local efficiency','participation coefficient','betweenness centrality'};
+% 'average controllability', 'modal controllability'
 
-Params.includeNMFcomponents = 0;  % whether to save extracted components and original downsampled data
+Params.includeNMFcomponents = 1;  % whether to save extracted components and original downsampled data
 
 % specify whether to include network plots scaled to all recordings 
 Params.includeNetMetScaledPlots = 1;
 
 %% Optional step : statistics and classification 
 Params.pValThreshold = 0.01;  % p value threshold to consider effect as significant
-
 %% Troubleshooting / Diagnostic settings 
-Params.verboseLevel = 'Silent';  % 'Normal', 'High', 'Silent'
-Params.timeProcesses = 1; % whether to log how long each process took
+Params.verboseLevel = 'Normal';  % 'Normal', 'High', 'Silent'
+Params.timeProcesses = 0; % whether to log how long each process took
 

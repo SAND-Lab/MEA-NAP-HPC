@@ -17,7 +17,7 @@ function PlotEphysStats(ExpName, Params, HomeDir, oneFigureHandle)
 % author RCFeord July 2021
 % Updated by Tim Sit 
 %% colours
-disp('after line 20')
+
 % colour scheme for age groups DIV
 ColOpt1 = [0.988 0.906 0.149];
 ColOpt2 = [0.710 0.871 0.173];
@@ -89,15 +89,11 @@ NetMetricsC = {'FR'};
 %% Import data from all experiments - whole experiment  
 
 experimentMatFolderPath = fullfile(Params.outputDataFolder, ...
-        strcat('OutputData',Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
-disp('After Line 93')
+        strcat('OutputData',Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
+
 for g = 1:length(Grps)
     % create structure for each group
-    disp(Grps) 
-    disp(Grps(g))
     VN1 = cell2mat(Grps(g));
-    disp(VN1)
-    disp(class(VN1))
     eval([VN1 '= [];']);
     
     % add substructure for each DIV range
@@ -142,7 +138,7 @@ for i = 1:length(ExpName)
      end
      clear Info NetMet adjMs
 end
-disp('After line 141')
+
 %% Import data from all experiments - electrode-specific data 
 
 for g = 1:length(Grps)
@@ -191,12 +187,12 @@ for i = 1:length(ExpName)
      clear Info NetMet adjMs
 end
 
-disp('After line 190')
+
 %% export to excel / csv
 % TODO: export to csv as well
 
 outputDataDateFolder = fullfile(Params.outputDataFolder, ...
-        strcat('OutputData',Params.Date, Params.NewFNsuffix));
+        strcat('OutputData',Params.Date,Params.NewFNSuffix));
 
 % network means
 for g = 1:length(Grps)
@@ -239,10 +235,10 @@ end
 
 clear DatTemp TempStr
 
-disp('After line 238')
+
 %% notBoxPlots - plots by group
 
-notBoxPlotByGroupFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNsuffix), ...
+notBoxPlotByGroupFolder = fullfile(Params.outputDataFolder, strcat('OutputData', Params.Date, Params.NewFNSuffix), ...
     '2_NeuronalActivity', '2B_GroupComparisons', '3_RecordingsByGroup', 'NotBoxPlots');
 
 eMet = NetMetricsE; 
@@ -319,8 +315,8 @@ if Params.includeNotBoxPlots
 end 
 
 %% halfViolinPlots - plots by group
-disp('After line 318')
-halfViolinPlotByGroupFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNsuffix), ...
+
+halfViolinPlotByGroupFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date,Params.NewFNSuffix), ...
     '2_NeuronalActivity', '2B_GroupComparisons', '3_RecordingsByGroup', 'HalfViolinPlots');
 
 eMet = NetMetricsE; 
@@ -332,7 +328,6 @@ eMetl = {'number of active electrodes','mean firing rate (Hz)','median firing ra
 
 p = [100 100 1300 600]; 
 set(0, 'DefaultFigurePosition', p)
-disp('After Lin 330') 
 
 for n = 1:length(eMet)
     all_group_eMet_vals = [];
@@ -406,7 +401,7 @@ for n = 1:length(eMet)
             fprintf('WARNING: custom bound first value and second value are equal, adding one to deal with this \n')
             custom_bound_vec(2) = custom_bound_vec(2) + 1;
         end 
-        disp('After line 400') 
+        
         h(1).YLim = custom_bound_vec;
     end 
 
@@ -432,7 +427,7 @@ end
 
 %% notBoxPlots - plots by DIV
 
-notBoxPlotByDivFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNsuffix), ...
+notBoxPlotByDivFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date,Params.NewFNSuffix), ...
     '2_NeuronalActivity', '2B_GroupComparisons', '4_RecordingsByAge', 'NotBoxPlots');
 
 eMet = NetMetricsE; 
@@ -496,7 +491,6 @@ if Params.includeNotBoxPlots
         h(1).XLim = [min(xt)-0.5 max(xt)+0.5];
 
         customBoundMatchVec = strcmp(eMetl(n), metricsWCustomBounds);
-        disp('After line 495')
         if sum(customBoundMatchVec) == 1
             bound_idx = find(customBoundMatchVec);
             custom_bound_vec = eMetCustomBounds{bound_idx, 2};
@@ -504,7 +498,6 @@ if Params.includeNotBoxPlots
             if isnan(custom_bound_vec(1))
                 custom_bound_vec(1) = min(all_group_eMet_vals);
             end 
-            
 
             if isnan(custom_bound_vec(2))
                 if isempty(all_group_eMet_vals)
@@ -549,7 +542,7 @@ end
 
 %% halfViolinPlots - plots by DIV
 
-halfViolinPlotByDivFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNsuffix), ...
+halfViolinPlotByDivFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date,Params.NewFNSuffix), ...
     '2_NeuronalActivity', '2B_GroupComparisons', '4_RecordingsByAge', 'HalfViolinPlots');
 
 eMet = NetMetricsE; 
@@ -558,7 +551,7 @@ eMetl = {'number of active electrodes','mean firing rate (Hz)','median firing ra
     'mean network burst length (s)','mean ISI within network burst (ms)', ... 
     'mean ISI outside network bursts (ms)','coefficient of variation of inter network burst intervals', ...
     'fraction of in network bursts'}; 
-disp('After line 557')
+
 p = [100 100 1300 600]; 
 set(0, 'DefaultFigurePosition', p)
 
@@ -658,10 +651,10 @@ for n = 1:length(eMet)
         close(F1);
     end 
 end
-disp('After line 657')
+
 %% halfViolinPlots - plots by group
 
-halfViolinPlotNodeByGroupFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNsuffix), ...
+halfViolinPlotNodeByGroupFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date,Params.NewFNSuffix), ...
     '2_NeuronalActivity', '2B_GroupComparisons', '1_NodeByGroup');
 
 eMet = NetMetricsC; 
@@ -741,9 +734,8 @@ for n = 1:length(eMet)
     end 
 end
 
-disp('After line 740')
 %% halfViolinPlots - plots by DIV : mean firing rate per electrode 
-halfViolinPlotByNodeDivFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNsuffix), ...
+halfViolinPlotByNodeDivFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date,Params.NewFNSuffix), ...
     '2_NeuronalActivity', '2B_GroupComparisons', '2_NodeByAge');
 
 eMet = NetMetricsC; 

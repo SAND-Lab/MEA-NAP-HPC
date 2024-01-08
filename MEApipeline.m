@@ -1,49 +1,54 @@
-% Process data from MEA recordings of 2D and 3D cultures
-% created: RCFeord, May 2021
-% authors: T Sit, RC Feord, AWE Dunn, J Chabros and other members of the Synaptic and Network Development (SAND) Group
+% Process data from MEA recordings of 2D and 3D neuronal cultures
+% Created: RC Feord, May 2021
+% Authors: T Sit, RC Feord, AWE Dunn, J Chabros and other members of the Synaptic and Network Development (SAND) Group
 %% USER INPUT REQUIRED FOR THIS SECTION
-% in this section all modifiable parameters of the analysis are defined,
-% no subsequent section requires user input
+% In this section all modifiable parameters of the analysis are defined.
+% No subsequent section requires user input.
 % Please refer to the documentation for guidance on parameter choice here:
 % https://analysis-pipeline.readthedocs.io/en/latest/pipeline-steps.html#pipeline-settings
+clear all 
+close all 
+restoredefaultpath
 
-NewFNsuffix = 'testv2';
+% Additional parameter for HPC 
+NewFNSuffix = '(20230208_NGN2 step 2 v2)'; % Suffix that will be appended to output folder name 
+Params.rasterColormap = 'parula';
 
 % Directories
-HomeDir = '/Users/davidoluigbo/MEA-NAP/'; % Where the Aanlysis pipeline code is located
+HomeDir = '/home/gridsan/doluigbo/MEA-NAP/'; % Where the MEA-NAP (MEA Network Analysis Pipeline) code is located
 Params.outputDataFolder = '';   % Where to save the output data, leave as '' if same as HomeDir 
-rawData = '/Users/davidoluigbo/MEA-NAP';  % path to raw data .mat files
-Params.priorAnalysisPath = ['/Volumes/Extreme_SSD/MEANAP/OutputData13Sep2023'];  % path to prev analysis, leave as [''] if no prior anlaysis
-spikeDetectedData = '/Volumes/Extreme_SSD/MEANAP/OutputData13Sep2023/1_SpikeDetection/1A_SpikeDetectedData'; % path to spike-detected data, leave as '' if no previously detected spike data
+rawData = '/home/gridsan/doluigbo/MEA-NAP/20230208_NGN2';  % path to raw data .mat files
+Params.priorAnalysisPath = ['/home/gridsan/doluigbo/MEA-NAP/OutputData07Jan2024(20230208_NGN2)'];  % path to prev analysis, leave as [''] if no prior anlaysis
+spikeDetectedData = '/home/gridsan/doluigbo/MEA-NAP/OutputData07Jan2024(20230208_NGN2)/1_SpikeDetection/1A_SpikeDetectedData'; % path to spike-detected data, leave as '' if no previously detected spike data
 
 % Input and output filetype
 spreadsheet_file_type = 'csv'; % 'csv' or 'excel'
-spreadsheet_filename = 'DRPLA_TinyBatch.csv'; 
+spreadsheet_filename = 'NGN2_20230208_batchanalysislist.csv'; 
 sheet = 1; % specify excel sheet
 xlRange = 'A2:C7'; % specify range on the sheet (e.g., 'A2:C7' would analyse the first 6 files)
 csvRange = [2, Inf]; % read the data in the range [StartRow EndRow], e.g. [2 Inf] means start reading data from row 2
 Params.output_spreadsheet_file_type = 'csv';  % .xlsx or .csv
 
 % Analysis step settings
-Params.priorAnalysisDate = '13Sep2023'; % prior analysis date in format given in output data folder e.g., '27Sep2021'
+Params.priorAnalysisDate = '07Jan2024'; % prior analysis date in format given in output data folder e.g., '27Sep2021'
 Params.priorAnalysis = 1; % use previously analysed data? 1 = yes, 0 = no
-Params.startAnalysisStep = 2; % if Params.priorAnalysis=0, default is to start with spike detection
-Params.optionalStepsToRun = {''}; % include 'generateCSV' to generate csv for rawData folder
-                                  % include 'runStats' to look at feature
+Params.startAnalysisStep = '2'; % if Params.priorAnalysis=0, default is to start with spike detection
+Params.optionalStepsToRun = {'Stats', 'combineDIVplots'}; % include 'generateCSV' to generate csv for rawData folder
+                                  % include 'Stats' to look at feature
                                   % correlation and classification across groups
                                   % include 'combineDIVplots' to combine plots across DIVs
 
 % Spike detection settings
-detectSpikes = 0; % run spike detection? % 1 = yes, 0 = no
+detectSpikes = 1; % run spike detection? % 1 = yes, 0 = no
 Params.runSpikeCheckOnPrevSpikeData = 0; % whether to run spike detection check without spike detection 
-Params.fs = 12500; % Sampling frequency, HPC: 25000, Axion: 12500;
-Params.dSampF = 12500; % down sampling factor for spike detection check
-Params.potentialDifferenceUnit = 'uV';  % the unit which you are recording electrical signals 
-Params.channelLayout = 'Axion64';  % 'MCS60' or 'Axion64' or 'MCS60old'
-Params.thresholds = {'4.5'}; % standard deviation multiplier threshold(s), eg. {'2.5', '3.5', '4.5'}
-Params.wnameList = {'bior1.5'}; % wavelet methods to use {'bior1.5', 'mea'}; 
+Params.fs = 12500; % Sampling frequency you selected when acquiring data, e.g., MCS: 25000, Axion: 12500;
+Params.dSampF = 12500; % down sampling factor for spike detection check, e.g., can set the same as the sampling frequency
+Params.potentialDifferenceUnit = 'uV';  % Unit for voltage signal, e.g., MCS: uV, Axion: V 
+Params.channelLayout = 'Axion64';  % 'MCS60' (for MEA2100), 'Axion64' (for 6-well plates), or 'MCS60old' (for MEA6100)
+Params.thresholds = {'3', '4', '5'}; % standard deviation multiplier threshold(s), eg. {'2.5', '3.5', '4.5'}
+Params.wnameList = {'bior1.5', 'bior1.3', 'db2'}; % wavelet methods to use e.g., {'bior1.5', 'bior1.3', 'mea'}; 
 Params.costList = -0.12;
-Params.SpikesMethod = 'bior1p5';  % wavelet methods, eg. 'bior1p5', or 'mergedAll', or 'mergedWavelet'
+Params.SpikesMethod = 'mergedWavelet';  % wavelet methods, e.g., 'bior1p5', or 'mergedAll', or 'mergedWavelet'
 
 % Functional connectivity inference settings
 Params.FuncConLagval = [10, 25, 50]; % set the different lag values (in ms), default to [10, 15, 25]
@@ -52,7 +57,7 @@ Params.TruncLength = 120; % length of truncated recordings (in seconds)
 Params.adjMtype = 'weighted'; % 'weighted' or 'binary'
 
 % Connectivity matrix thresholding settings
-Params.ProbThreshRepNum = 200; % probabilistic thresholding number of repeats 
+Params.ProbThreshRepNum = 200; % probabilistic thresholding number of repeats (recommend at least 180) 
 Params.ProbThreshTail = 0.05; % probabilistic thresholding percentile threshold 
 Params.ProbThreshPlotChecks = 1; % randomly sample recordings to plot probabilistic thresholding check, 1 = yes, 0 = no
 Params.ProbThreshPlotChecksN = 5; % number of random checks to plot
@@ -73,11 +78,11 @@ Params.fullSVG = 1;  % whether to insist svg even with plots with large number o
 Params.showOneFig = 1;  % otherwise, 0 = pipeline shows plots as it runs, 1: supress plots
 
 %% GUI / Tutorial mode settings 
-Params.guiMode = 0;
+Params.guiMode = 0;   % GUI mode? 1 = on, 0 = off
 if Params.guiMode == 1
     runPipelineApp
+    spikeDetectedData = Params.spikeDetectedData;
 end 
-
 
 %% Paths 
 % add all relevant folders to path
@@ -91,8 +96,8 @@ addpath('Images')
 % unless you are an expert user.
 % Define output folder names
 formatOut = 'ddmmmyyyy'; 
+Params.NewFNSuffix = NewFNSuffix;
 Params.Date = datestr(now,formatOut); 
-Params.NewFNsuffix = NewFNsuffix;
 clear formatOut
 
 biAdvancedSettings
@@ -103,7 +108,16 @@ if Params.runSpikeCheckOnPrevSpikeData
     detectSpikes = 0;
 end 
 
-Params.detectSpikes = detectSpikes;  % As a record of option selection 
+Params.detectSpikes = detectSpikes;  % As a record of option selection
+
+% Allow starting from a subset of steps 
+if length(Params.startAnalysisStep) > 1
+    Params.startAnalysisSubStep = Params.startAnalysisStep(2);
+    Params.startAnalysisStep = str2num(Params.startAnalysisStep(1));
+else
+    Params.startAnalysisStep = str2num(Params.startAnalysisStep);
+    Params.startAnalysisSubStep = 'ALL';
+end 
 
 %% Optional step : generate csv 
 if any(strcmp(Params.optionalStepsToRun,'generateCSV')) 
@@ -128,7 +142,7 @@ setUpSpreadSheet  % import metadata from spreadsheet
 [~,Params.DivNm] = findgroups(ExpDIV);
 
 % create output data folder if doesn't exist
-CreateOutputFolders(HomeDir, Params.outputDataFolder, Params.Date, Params.GrpNm, Params.NewFNsuffix)
+CreateOutputFolders(HomeDir, Params.outputDataFolder, Params.Date, Params.GrpNm, Params.NewFNSuffix)
 
 % Set up one figure handle to save all the figures
 oneFigureHandle = NaN;
@@ -138,7 +152,7 @@ oneFigureHandle = checkOneFigureHandle(Params, oneFigureHandle);
 plotElectrodeLayout(Params.outputDataFolder, Params, oneFigureHandle)
 
 % export parameters to csv file
-outputDataWDatePath = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNsuffix));
+outputDataWDatePath = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNSuffix));
 ParamsTableSavePath = fullfile(outputDataWDatePath, strcat('Parameters_',Params.Date,'.csv'));
 writetable(struct2table(Params,'AsArray',true), ParamsTableSavePath)
 
@@ -164,13 +178,19 @@ end
 if ((Params.priorAnalysis == 0) || (Params.runSpikeCheckOnPrevSpikeData)) && (Params.startAnalysisStep == 1) 
 
     if (detectSpikes == 1) || (Params.runSpikeCheckOnPrevSpikeData)
-        addpath(rawData)
+        if iscell(rawData)
+            for pathIdx = 1:length(rawData)
+                addpath(rawData{pathIdx});
+            end 
+        else 
+            addpath(rawData)
+        end 
     else
         addpath(spikeDetectedData)
     end
     
     savePath = fullfile(Params.outputDataFolder, ...
-                        strcat('OutputData', Params.Date, Params.NewFNsuffix), ...
+                        strcat('OutputData', Params.Date, Params.NewFNSuffix), ...
                         '1_SpikeDetection', '1A_SpikeDetectedData');
     
     % Run spike detection
@@ -180,7 +200,7 @@ if ((Params.priorAnalysis == 0) || (Params.runSpikeCheckOnPrevSpikeData)) && (Pa
     
     % Specify where ExperimentMatFiles are stored
     experimentMatFileFolder = fullfile(Params.outputDataFolder, ...
-           strcat('OutputData',Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
+           strcat('OutputData',Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
 
     % Plot spike detection results 
     for  ExN = 1:length(ExpName)
@@ -189,7 +209,7 @@ if ((Params.priorAnalysis == 0) || (Params.runSpikeCheckOnPrevSpikeData)) && (Pa
             spikeDetectedDataOutputFolder = spikeDetectedData;
         else
             spikeDetectedDataOutputFolder = fullfile(Params.outputDataFolder, ...
-                strcat('OutputData', Params.Date, Params.NewFNsuffix), '1_SpikeDetection', '1A_SpikeDetectedData'); 
+                strcat('OutputData', Params.Date, Params.NewFNSuffix), '1_SpikeDetection', '1A_SpikeDetectedData'); 
         end 
         
         spikeFilePath = fullfile(spikeDetectedDataOutputFolder, strcat(char(ExpName(ExN)),'_spikes.mat'));
@@ -200,7 +220,7 @@ if ((Params.priorAnalysis == 0) || (Params.runSpikeCheckOnPrevSpikeData)) && (Pa
         load(experimentMatFilePath,'Info')
 
         spikeDetectionCheckGrpFolder = fullfile(Params.outputDataFolder, ...
-            strcat('OutputData',Params.Date, Params.NewFNsuffix), '1_SpikeDetection', '1B_SpikeDetectionChecks', char(Info.Grp));
+            strcat('OutputData',Params.Date, Params.NewFNSuffix), '1_SpikeDetection', '1B_SpikeDetectionChecks', char(Info.Grp));
         FN = char(Info.FN);
         spikeDetectionCheckFNFolder = fullfile(spikeDetectionCheckGrpFolder, FN);
 
@@ -211,7 +231,7 @@ if ((Params.priorAnalysis == 0) || (Params.runSpikeCheckOnPrevSpikeData)) && (Pa
         plotSpikeDetectionChecks(spikeTimes, spikeDetectionResult, ...
             spikeWaveforms, Info, Params, spikeDetectionCheckFNFolder, oneFigureHandle)
         
-        % Check whether there are no spikes at all in recording 
+        % Check whether there are no spikes at all in the recording 
         checkIfAnySpikes(spikeTimes, ExpName{ExN});
 
     end
@@ -223,7 +243,7 @@ if Params.priorAnalysis==0 || Params.priorAnalysis==1 && Params.startAnalysisSte
     fprintf('Running step 2 of MEA-NAP: neuronal activity \n')
     % Format spike data
     experimentMatFolderPath = fullfile(Params.outputDataFolder, ...
-        strcat('OutputData',Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
+        strcat('OutputData',Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
 
     for  ExN = 1:length(ExpName)
             
@@ -239,7 +259,7 @@ if Params.priorAnalysis==0 || Params.priorAnalysis==1 && Params.startAnalysisSte
         else
             if detectSpikes == 1
                 spikeDetectedDataFolder = fullfile(Params.outputDataFolder, ...
-                    strcat('OutputData', Params.Date, Params.NewFNsuffix), '1_SpikeDetection', ...
+                    strcat('OutputData', Params.Date, Params.NewFNSuffix), '1_SpikeDetection', ...
                     '1A_SpikeDetectedData');
             else
                 spikeDetectedDataFolder = spikeDetectedData;
@@ -250,7 +270,7 @@ if Params.priorAnalysis==0 || Params.priorAnalysis==1 && Params.startAnalysisSte
         [spikeMatrix,spikeTimes,Params,Info] = formatSpikeTimes(... 
             char(Info.FN), Params, Info, spikeDetectedDataFolder, channelLayout);
 
-        % initial run-through to establish max values for scaling
+        % initial run through to establish max values for scaling
         spikeFreqMax(ExN) = prctile((downSampleSum(full(spikeMatrix), Info.duration_s)),95,'all');
         
         infoFnFilePath = fullfile(experimentMatFolderPath, ...
@@ -280,7 +300,7 @@ if Params.priorAnalysis==0 || Params.priorAnalysis==1 && Params.startAnalysisSte
         Ephys = firingRatesBursts(spikeMatrix,Params,Info);
         
         idvNeuronalAnalysisGrpFolder = fullfile(Params.outputDataFolder, ...
-            strcat('OutputData',Params.Date, Params.NewFNsuffix), '2_NeuronalActivity', ...
+            strcat('OutputData',Params.Date, Params.NewFNSuffix), '2_NeuronalActivity', ...
             '2A_IndividualNeuronalAnalysis', char(Info.Grp));
         
         if ~isfolder(idvNeuronalAnalysisGrpFolder)
@@ -312,7 +332,7 @@ if Params.priorAnalysis==0 || Params.priorAnalysis==1 && Params.startAnalysisSte
 
     % create combined plots across groups/ages
     PlotEphysStats(ExpName,Params,HomeDir, oneFigureHandle)
-    saveEphysStats(ExpName, Params, HomeDir)
+    saveEphysStats(ExpName, Params)
     cd(HomeDir)
 
 end
@@ -337,7 +357,7 @@ if Params.priorAnalysis==0 || Params.priorAnalysis==1 && Params.startAnalysisSte
             load(spikeDataFpath, 'spikeTimes', 'Ephys', 'Info')
         else
             ExpMatFolder = fullfile(Params.outputDataFolder, ...
-                strcat('OutputData',Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
+                strcat('OutputData',Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
             spikeDataFname = strcat(char(ExpName(ExN)),'_',Params.Date,'.mat');
             spikeDataFpath = fullfile(ExpMatFolder, spikeDataFname);
             load(spikeDataFpath, 'Info', 'Params', 'spikeTimes', 'Ephys')
@@ -345,10 +365,10 @@ if Params.priorAnalysis==0 || Params.priorAnalysis==1 && Params.startAnalysisSte
 
         disp(char(Info.FN))
 
-        adjMs = generateAdjMs(spikeTimes,ExN,Params,Info,HomeDir, oneFigureHandle);
+        adjMs = generateAdjMs(spikeTimes, ExN, Params, Info, oneFigureHandle);
 
         ExpMatFolder = fullfile(Params.outputDataFolder, ...
-                strcat('OutputData',Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
+                strcat('OutputData',Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
         infoFnFname = strcat(char(Info.FN),'_',Params.Date,'.mat');
         infoFnFilePath = fullfile(ExpMatFolder, infoFnFname);
         save(infoFnFilePath, 'Info', 'Params', 'spikeTimes', 'Ephys', 'adjMs')
@@ -363,146 +383,80 @@ if Params.priorAnalysis==0 || Params.priorAnalysis==1 && Params.startAnalysisSte
     % Set up one figure handle to save all the figures
     oneFigureHandle = NaN;
     oneFigureHandle = checkOneFigureHandle(Params, oneFigureHandle);
+    
+    % Step 4 Analysis step
+    if strcmp(Params.startAnalysisSubStep, 'ALL')
+        for  ExN = 1:length(ExpName) 
 
-    for  ExN = 1:length(ExpName) 
-        
-        if Params.priorAnalysis==1 && Params.startAnalysisStep==4
-            priorAnalysisExpMatFolder = fullfile(Params.priorAnalysisPath, 'ExperimentMatFiles');
-            spikeDataFname = strcat(char(ExpName(ExN)),'_',Params.priorAnalysisDate,'.mat');
-            spikeDataFpath = fullfile(priorAnalysisExpMatFolder, spikeDataFname);
-            load(spikeDataFpath, 'spikeTimes', 'Ephys','adjMs','Info')
-        else
+            if Params.priorAnalysis==1 && Params.startAnalysisStep==4
+                priorAnalysisExpMatFolder = fullfile(Params.priorAnalysisPath, 'ExperimentMatFiles');
+                spikeDataFname = strcat(char(ExpName(ExN)),'_',Params.priorAnalysisDate,'.mat');
+                spikeDataFpath = fullfile(priorAnalysisExpMatFolder, spikeDataFname);
+                load(spikeDataFpath, 'spikeTimes', 'Ephys','adjMs','Info')
+            else
+                ExpMatFolder = fullfile(Params.outputDataFolder, ...
+                    strcat('OutputData',Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
+                spikeDataFname = strcat(char(ExpName(ExN)),'_',Params.Date,'.mat');
+                spikeDataFpath = fullfile(ExpMatFolder, spikeDataFname);
+                load(spikeDataFpath, 'Info', 'Params', 'spikeTimes', 'Ephys','adjMs')
+            end
+
+            disp(char(Info.FN))
+
+            idvNetworkAnalysisGrpFolder = fullfile(Params.outputDataFolder, ...
+                strcat('OutputData',Params.Date, Params.NewFNSuffix), '4_NetworkActivity', ...
+                '4A_IndividualNetworkAnalysis', char(Info.Grp));
+
+            idvNetworkAnalysisFNFolder = fullfile(idvNetworkAnalysisGrpFolder, char(Info.FN));
+            if ~isfolder(idvNetworkAnalysisFNFolder)
+                mkdir(idvNetworkAnalysisFNFolder)
+            end 
+
+            if Params.priorAnalysis == 1
+                if isempty(spikeDetectedData)
+                    spikeDetectedDataFolder = fullfile(Params.outputDataFolder, ...
+                        strcat('OutputData', Params.Date, Params.NewFNSuffix), '1_SpikeDetection', ...
+                        '1A_SpikeDetectedData');
+                else 
+                    spikeDetectedDataFolder = spikeDetectedData;
+                end 
+            else
+                spikeDetectedDataFolder = fullfile(Params.outputDataFolder, ...
+                        strcat('OutputData', Params.Date, Params.NewFNSuffix), '1_SpikeDetection', ...
+                        '1A_SpikeDetectedData');
+            end 
+
+            channelLayout = Params.channelLayoutPerRecording{ExN};
+            [spikeMatrix, spikeTimes, Params, Info] = formatSpikeTimes(char(Info.FN), ...
+                Params, Info, spikeDetectedDataFolder, channelLayout);
+
+            Params.networkActivityFolder = idvNetworkAnalysisFNFolder;
+
+            coords = Params.coords{ExN};
+            channels = Params.channels{ExN};
+            NetMet = ExtractNetMet(adjMs, spikeTimes, ...
+                Params.FuncConLagval, Info,HomeDir,Params, spikeMatrix, coords, channels, oneFigureHandle);
+
             ExpMatFolder = fullfile(Params.outputDataFolder, ...
-                strcat('OutputData',Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
-            spikeDataFname = strcat(char(ExpName(ExN)),'_',Params.Date,'.mat');
-            spikeDataFpath = fullfile(ExpMatFolder, spikeDataFname);
-            load(spikeDataFpath, 'Info', 'Params', 'spikeTimes', 'Ephys','adjMs')
+                    strcat('OutputData',Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
+            infoFnFname = strcat(char(Info.FN),'_',Params.Date,'.mat');
+            infoFnFilePath = fullfile(ExpMatFolder, infoFnFname);
+
+            save(infoFnFilePath, 'Info', 'Params', 'spikeTimes', 'Ephys', 'adjMs','NetMet', '-append')
+
+            clear adjMs
+
         end
 
-        disp(char(Info.FN))
-        
-        idvNetworkAnalysisGrpFolder = fullfile(Params.outputDataFolder, ...
-            strcat('OutputData',Params.Date, Params.NewFNsuffix), '4_NetworkActivity', ...
-            '4A_IndividualNetworkAnalysis', char(Info.Grp));
-        
-        idvNetworkAnalysisFNFolder = fullfile(idvNetworkAnalysisGrpFolder, char(Info.FN));
-        if ~isfolder(idvNetworkAnalysisFNFolder)
-            mkdir(idvNetworkAnalysisFNFolder)
-        end 
-        
-        if Params.priorAnalysis == 1
-            if isempty(spikeDetectedData)
-                spikeDetectedDataFolder = fullfile(Params.outputDataFolder, ...
-                    strcat('OutputData', Params.Date, Params.NewFNsuffix), '1_SpikeDetection', ...
-                    '1A_SpikeDetectedData');
-            else 
-                spikeDetectedDataFolder = spikeDetectedData;
-            end 
-        else
-            spikeDetectedDataFolder = fullfile(Params.outputDataFolder, ...
-                    strcat('OutputData', Params.Date, Params.NewFNsuffix), '1_SpikeDetection', ...
-                    '1A_SpikeDetectedData');
-        end 
-        
-        channelLayout = Params.channelLayoutPerRecording{ExN};
-        [spikeMatrix, spikeTimes, Params, Info] = formatSpikeTimes(char(Info.FN), ...
-            Params, Info, spikeDetectedDataFolder, channelLayout);
-
-        Params.networkActivityFolder = idvNetworkAnalysisFNFolder;
-        
-        coords = Params.coords{ExN};
-        channels = Params.channels{ExN};
-        NetMet = ExtractNetMet(adjMs, spikeTimes, ...
-            Params.FuncConLagval, Info,HomeDir,Params, spikeMatrix, coords, channels, oneFigureHandle);
-
-        ExpMatFolder = fullfile(Params.outputDataFolder, ...
-                strcat('OutputData',Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
-        infoFnFname = strcat(char(Info.FN),'_',Params.Date,'.mat');
-        infoFnFilePath = fullfile(ExpMatFolder, infoFnFname);
-        
-        save(infoFnFilePath, 'Info', 'Params', 'spikeTimes', 'Ephys', 'adjMs','NetMet', '-append')
-
-        clear adjMs
-
-    end
+        % save and export network data to spreadsheet
+        saveNetMet(ExpName, Params, HomeDir)
+ 
     
-    % save and export network data to spreadsheet
-    saveNetMet(ExpName, Params, HomeDir)
-    
-    % Make network plots with shared colorbar and edge weight widths etc.
-    outputDataDateFolder = fullfile(Params.outputDataFolder, ...
-        strcat('OutputData', Params.Date, Params.NewFNsuffix));
-    minMax = findMinMaxNetMetTable(outputDataDateFolder, Params);
-    minMax.EW = [0.1, 1];
-    Params.metricsMinMax = minMax;
-    Params.useMinMaxBoundsForPlots = 1;
-    Params.sideBySideBoundPlots = 1;
-    
-    for ExN = 1:length(ExpName) 
-        
-        % Testing: make figure handle per recording 
         % Set up one figure handle to save all the figures
         oneFigureHandle = NaN;
         oneFigureHandle = checkOneFigureHandle(Params, oneFigureHandle);
-        
-        disp(ExpName(ExN))
-        % load NetMet 
-        experimentMatFileFolder = fullfile(Params.outputDataFolder, ...
-            strcat('OutputData', Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
-        experimentMatFilePath = fullfile(experimentMatFileFolder, ...
-            strcat(char(ExpName(ExN)),'_',Params.Date,'.mat'));
-        
-        expData = load(experimentMatFilePath);
-        idvNetworkAnalysisGrpFolder = fullfile(Params.outputDataFolder, ...
-            strcat('OutputData',Params.Date, Params.NewFNsuffix), '4_NetworkActivity', ...
-            '4A_IndividualNetworkAnalysis', char(expData.Info.Grp));
-        
-        idvNetworkAnalysisFNFolder = fullfile(idvNetworkAnalysisGrpFolder, char(expData.Info.FN));
-        if ~isfolder(idvNetworkAnalysisFNFolder)
-            mkdir(idvNetworkAnalysisFNFolder)
-        end 
-        
-        Params.networkActivityFolder = idvNetworkAnalysisFNFolder;
-        
-        originalCoords = Params.coords{ExN};
-        originalChannels = Params.channels{ExN};
-        PlotIndvNetMet(expData, Params, expData.Info, originalCoords, originalChannels,  oneFigureHandle)
-        
-        if Params.showOneFig
-            clf(oneFigureHandle)
-        else
-            close all 
-        end 
-        
-        % Testing: Always close all the figures
-        close all
-        if strcmp(Params.verboseLevel, 'High')
-            getMemoryUsage
-            numTotalGraphicObjects = length(findall(groot));
-            fprintf(sprintf('Total number of graphic objects: %.f \n', numTotalGraphicObjects))
-        end 
-         
-    end
-    
-    % create combined plots
-    PlotNetMet(ExpName, Params, HomeDir, oneFigureHandle)
-    
-    if Params.includeNMFcomponents
-        % Plot NMF 
-        experimentMatFolder = fullfile(HomeDir, ...
-            strcat('OutputData',Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
-        plotSaveFolder = fullfile(HomeDir, ...
-            strcat('OutputData',Params.Date, Params.NewFNsuffix), '4_NetworkActivity', ...
-            '4A_IndividualNetworkAnalysis');
-        plotNMF(experimentMatFolder, plotSaveFolder, Params)
-    end 
-    
-    % Set up one figure handle to save all the figures
-    oneFigureHandle = NaN;
-    oneFigureHandle = checkOneFigureHandle(Params, oneFigureHandle);
 
 
-    
     % Aggregate all files and run density analysis to determine boundaries
     % for node cartography
     if Params.autoSetCartographyBoundaries
@@ -514,12 +468,12 @@ if Params.priorAnalysis==0 || Params.priorAnalysis==1 && Params.startAnalysisSte
                 '4_NetworkActivity', '4B_GroupComparisons', '7_DensityLandscape');
         else
             experimentMatFileFolder = fullfile(Params.outputDataFolder, ...
-                strcat('OutputData', Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
-            % cd(fullfile(strcat('OutputData', Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles'));  
-            fig_folder = fullfile(Params.outputDataFolder, strcat('OutputData', Params.Date, Params.NewFNsuffix), ...
+                strcat('OutputData', Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
+            % cd(fullfile(strcat('OutputData', Params.Date), 'ExperimentMatFiles'));  
+            fig_folder = fullfile(Params.outputDataFolder, strcat('OutputData', Params.Date, Params.NewFNSuffix), ...
                 '4_NetworkActivity', '4B_GroupComparisons', '7_DensityLandscape');
         end 
-        
+
         if ~isfolder(fig_folder)
             mkdir(fig_folder)
         end 
@@ -531,7 +485,7 @@ if Params.priorAnalysis==0 || Params.priorAnalysis==1 && Params.startAnalysisSte
             for lag_val = Params.FuncConLagval
                 [hubBoundaryWMdDeg, periPartCoef, proHubpartCoef, nonHubconnectorPartCoef, connectorHubPartCoef] = ...
                 TrialLandscapeDensity(ExpList, fig_folder, add_fig_info, lag_val, oneFigureHandle);
-                
+
                 if isnan(hubBoundaryWMdDeg)
                     hubBoundaryWMdDeg = Params.hubBoundaryWMdDeg;
                     periPartCoef = Params.periPartCoef;
@@ -539,7 +493,7 @@ if Params.priorAnalysis==0 || Params.priorAnalysis==1 && Params.startAnalysisSte
                     nonHubconnectorPartCoef = Params.nonHubconnectorPartCoef; 
                     connectorHubPartCoef = Params.connectorHubPartCoef;
                 end 
-            
+
                 Params.(strcat('hubBoundaryWMdDeg', sprintf('_%.fmsLag', lag_val))) = hubBoundaryWMdDeg;
                 Params.(strcat('periPartCoef', sprintf('_%.fmsLag', lag_val))) = periPartCoef;
                 Params.(strcat('proHubpartCoef', sprintf('_%.fmsLag', lag_val))) = proHubpartCoef;
@@ -561,59 +515,220 @@ if Params.priorAnalysis==0 || Params.priorAnalysis==1 && Params.startAnalysisSte
 
         % save the newly set boundaries to the Params struct
         experimentMatFileFolderToSaveTo = fullfile(Params.outputDataFolder, ...
-                strcat('OutputData', Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
+                strcat('OutputData', Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
         for nFile = 1:length(ExpList)
             FN = ExpList(nFile).name;
             FNPath = fullfile(experimentMatFileFolderToSaveTo, FN);
             save(FNPath, 'Params', '-append')
         end 
-       
+
+
+    end 
+        % Run through each file to do node cartography analysis 
+        for ExN = 1:length(ExpName) 
+            if Params.priorAnalysis==1 && Params.startAnalysisStep==4 && usePriorNetMet
+                experimentMatFileFolder = fullfile(Params.priorAnalysisPath, 'ExperimentMatFiles');
+                experimentMatFilePath = fullfile(experimentMatFileFolder, strcat(char(ExpName(ExN)),'_',Params.priorAnalysisDate,'.mat'));
+                expData = load(experimentMatFilePath, 'spikeTimes','Ephys','adjMs','Info', 'NetMet');
+            else
+                experimentMatFileFolder = fullfile(Params.outputDataFolder, strcat('OutputData', Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
+                experimentMatFilePath = fullfile(experimentMatFileFolder, strcat(char(ExpName(ExN)),'_',Params.Date,'.mat'));
+                expData = load(experimentMatFilePath,'Info','Params', 'spikeTimes','Ephys','adjMs', 'NetMet');
+            end
+            fileNameFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNSuffix), ...
+                                      '4_NetworkActivity', '4A_IndividualNetworkAnalysis', ...
+                                      char(expData.Info.Grp), char(expData.Info.FN));
+            NetMet = calNodeCartography(expData.adjMs, Params, expData.NetMet, expData.Info, originalCoords, originalChannels, ...
+            HomeDir, fileNameFolder, oneFigureHandle);
+            % save NetMet now that we have node cartography data as well
+            experimentMatFileFolderToSaveTo = fullfile(Params.outputDataFolder, strcat('OutputData', Params.Date), 'ExperimentMatFiles');
+            experimentMatFilePathToSaveTo = fullfile(experimentMatFileFolderToSaveTo, strcat(char(expData.Info.FN),'_',Params.Date,'.mat'));
+
+            spikeTimes = expData.spikeTimes;
+            Ephys = expData.Ephys;
+            adjMs = expData.adjMs;
+            Info = expData.Info;
+            save(experimentMatFilePathToSaveTo,'Info','Params','spikeTimes','Ephys','adjMs','NetMet')
+        end
         
     end 
+    
+    
+    %%% 4B: create combined plots %%%
+    if strcmp(Params.startAnalysisSubStep, 'ALL') || strcmp(Params.startAnalysisSubStep, 'B')
+        
+        if strcmp(Params.startAnalysisSubStep, 'ALL')
+            experimentMatFileFolder = fullfile(Params.outputDataFolder, ... 
+                strcat('OutputData',Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
+        elseif strcmp(Params.startAnalysisSubStep, 'B')
+            experimentMatFileFolder =  fullfile(Params.outputDataFolder, ... 
+                strcat('OutputData', Params.priorAnalysisDate), 'ExperimentMatFiles');
+        end
+        % (everything except node cartography)
+        PlotNetMet(ExpName, Params, experimentMatFileFolder, oneFigureHandle)
 
-    % Plot node cartography plots using either custom bounds or
-    % automatically determined bounds
-    for  ExN = 1:length(ExpName)
+        % Plot node cartography metrics across all recordings     
+        NetMetricsE = Params.networkLevelNetMetToPlot;
+        NetMetricsC = Params.unitLevelNetMetToPlot;
+        experimentMatFileFolderToSaveTo = fullfile(Params.outputDataFolder, ...
+            strcat('OutputData', Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
+        combinedData = combineExpNetworkData(ExpName, Params, NetMetricsE, ...
+            NetMetricsC, experimentMatFileFolder, experimentMatFileFolderToSaveTo);
+        figFolder = fullfile(Params.outputDataFolder, strcat('OutputData', Params.Date, Params.NewFNSuffix), ...
+            '4_NetworkActivity', '4B_GroupComparisons', '6_NodeCartographyByLag');
+        plotNetMetNodeCartography(combinedData, ExpName,Params, HomeDir, figFolder, oneFigureHandle)
+    end 
 
-        if Params.priorAnalysis==1 && Params.startAnalysisStep==4 && usePriorNetMet
-            experimentMatFileFolder = fullfile(Params.priorAnalysisPath, 'ExperimentMatFiles');
-            experimentMatFilePath = fullfile(experimentMatFileFolder, strcat(char(ExpName(ExN)),'_',Params.priorAnalysisDate,'.mat'));
-            % TODO: load as struct rather than into workspace
-            load(experimentMatFilePath, 'spikeTimes','Ephys','adjMs','Info', 'NetMet')
-        else
-            experimentMatFileFolder = fullfile(Params.outputDataFolder, strcat('OutputData', Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
-            experimentMatFilePath = fullfile(experimentMatFileFolder, strcat(char(ExpName(ExN)),'_',Params.Date,'.mat'));
-            load(experimentMatFilePath,'Info','Params', 'spikeTimes','Ephys','adjMs', 'NetMet')
+    
+    %%%%% 4A: individual plots %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % 4A Part 1: General network metrics
+    % Make network plots with shared colorbar and edge weight widths etc.
+    if strcmp(Params.startAnalysisSubStep, 'ALL') || strcmp(Params.startAnalysisSubStep, 'A')
+        outputDataDateFolder = fullfile(Params.outputDataFolder, ...
+            strcat('OutputData', Params.Date, Params.NewFNSuffix));
+        minMax = findMinMaxNetMetTable(outputDataDateFolder, Params);
+        minMax.EW = [0.1, 1];
+        Params.metricsMinMax = minMax;
+        Params.useMinMaxBoundsForPlots = 1;
+        Params.sideBySideBoundPlots = 1;
+        for ExN = 1:length(ExpName) 
+
+            % Testing: make figure handle per recording 
+            % Set up one figure handle to save all the figures
+            oneFigureHandle = NaN;
+            oneFigureHandle = checkOneFigureHandle(Params, oneFigureHandle);
+
+            disp(ExpName(ExN))
+            % load NetMet 
+            experimentMatFileFolder = fullfile(Params.outputDataFolder, ...
+                strcat('OutputData', Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
+            experimentMatFilePath = fullfile(experimentMatFileFolder, ...
+                strcat(char(ExpName(ExN)),'_',Params.Date,'.mat'));
+
+            expData = load(experimentMatFilePath);
+            idvNetworkAnalysisGrpFolder = fullfile(Params.outputDataFolder, ...
+                strcat('OutputData',Params.Date, Params.NewFNSuffix), '4_NetworkActivity', ...
+                '4A_IndividualNetworkAnalysis', char(expData.Info.Grp));
+
+            idvNetworkAnalysisFNFolder = fullfile(idvNetworkAnalysisGrpFolder, char(expData.Info.FN));
+            if ~isfolder(idvNetworkAnalysisFNFolder)
+                mkdir(idvNetworkAnalysisFNFolder)
+            end 
+
+            Params.networkActivityFolder = idvNetworkAnalysisFNFolder;
+
+            originalCoords = Params.coords{ExN};
+            originalChannels = Params.channels{ExN};
+            PlotIndvNetMet(expData, Params, expData.Info, originalCoords, originalChannels,  oneFigureHandle)
+
+            if Params.showOneFig
+                clf(oneFigureHandle)
+            else
+                close all 
+            end 
+
+            % Testing: Always close all the figures
+            close all
+            if strcmp(Params.verboseLevel, 'High')
+                getMemoryUsage
+                numTotalGraphicObjects = length(findall(groot));
+                fprintf(sprintf('Total number of graphic objects: %.f \n', numTotalGraphicObjects))
+            end 
+
         end
 
-        disp(char(Info.FN))
+        % 4A Part 2: NMF individual plot
+        if Params.includeNMFcomponents
+            % Plot NMF 
+            experimentMatFolder = fullfile(Params.outputDataFolder, ...
+                strcat('OutputData',Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
+            plotSaveFolder = fullfile(Params.outputDataFolder, ...
+                strcat('OutputData',Params.Date, Params.NewFNSuffix), '4_NetworkActivity', ...
+                '4A_IndividualNetworkAnalysis');
+            plotNMF(experimentMatFolder, plotSaveFolder, Params)
+        end 
 
-        fileNameFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNsuffix), ...
-                                  '4_NetworkActivity', '4A_IndividualNetworkAnalysis', ...
-                                  char(Info.Grp), char(Info.FN));
+        % 4A Part 3: Node cartography individual plot
+        % Plot node cartography plots using either custom bounds or
+        % automatically determined bounds
 
-        originalCoords = Params.coords{ExN};
-        originalChannels = Params.channels{ExN};
-        NetMet = plotNodeCartography(adjMs, Params, NetMet, Info, ...
-            originalCoords, originalChannels, HomeDir, fileNameFolder, oneFigureHandle);
-        % save NetMet now that we have node cartography data as well
-        experimentMatFileFolderToSaveTo = fullfile(Params.outputDataFolder, strcat('OutputData', Params.Date, Params.NewFNsuffix), 'ExperimentMatFiles');
-        experimentMatFilePathToSaveTo = fullfile(experimentMatFileFolderToSaveTo, strcat(char(Info.FN),'_',Params.Date,'.mat'));
-        save(experimentMatFilePathToSaveTo,'Info','Params','spikeTimes','Ephys','adjMs','NetMet')
+        % Group the ExpNames by their file identity, to anchor coordinates to
+        % the last DIV
+        for ExN = 1:length(ExpName)
+            stringParts = strsplit(ExpName{ExN}, '_');
+            stringPartWithDIV_index = find(contains(stringParts, 'DIV'));
+            stringPartWithoutDIV_index = find(~contains(stringParts, 'DIV'));
+            ExpNamesWithoutDIV{ExN} = strjoin(stringParts(stringPartWithoutDIV_index), '_');
+            divPerExN(ExN) = str2num(stringParts{stringPartWithDIV_index}(4:end));  % first three characters are always 'DIV'
+        end
+        ExpNameGroup = findgroups(ExpNamesWithoutDIV);
+        ExpNameGroupUseCoord = zeros(length(ExpNamesWithoutDIV), 1);
+        for groupNum = unique(ExpNameGroup)
+            subsetIndex = find(ExpNameGroup == groupNum);
+            divMaxIndex = find(divPerExN(subsetIndex) == max(divPerExN(subsetIndex)));
+            ExpNameGroupUseCoord(subsetIndex(divMaxIndex)) = 1; 
+        end 
+
+        % Loop through each group 
+        for groupNum = unique(ExpNameGroup)
+            subsetIndex = find(ExpNameGroup == groupNum);
+            % Put the recording to be used as the anchor as the first recording
+            % to analyse
+            [~, sort_index] = sort(ExpNameGroupUseCoord(subsetIndex), 'descend');
+            ExNorderToAnalyse = subsetIndex(sort_index);
+            for ExN = ExNorderToAnalyse
+                Params.ExpNameGroupUseCoord = ExpNameGroupUseCoord(ExN);
+                if Params.priorAnalysis==1 && Params.startAnalysisStep==4 && usePriorNetMet
+                    experimentMatFileFolder = fullfile(Params.priorAnalysisPath, 'ExperimentMatFiles');
+                    experimentMatFilePath = fullfile(experimentMatFileFolder, strcat(char(ExpName(ExN)),'_',Params.priorAnalysisDate,'.mat'));
+                    expData = load(experimentMatFilePath, 'spikeTimes','Ephys','adjMs','Info', 'NetMet');
+                else
+                    experimentMatFileFolder = fullfile(Params.outputDataFolder, strcat('OutputData', Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
+                    experimentMatFilePath = fullfile(experimentMatFileFolder, strcat(char(ExpName(ExN)),'_',Params.Date,'.mat'));
+                    expData = load(experimentMatFilePath,'Info','Params', 'spikeTimes','Ephys','adjMs', 'NetMet');
+                end
+
+                disp(char(expData.Info.FN))
+
+                fileNameFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNSuffix), ...
+                                      '4_NetworkActivity', '4A_IndividualNetworkAnalysis', ...
+                                      char(expData.Info.Grp), char(expData.Info.FN));
+
+                originalCoords = Params.coords{ExN};
+                originalChannels = Params.channels{ExN};
+
+                % apply the anchoring index used in previous recording
+                if Params.ExpNameGroupUseCoord == 0
+                    for lagval = Params.FuncConLagval
+                         expData.NetMet.(sprintf('AnchoredReorderingIndex%.fmslag', lagval)) = tempNetMet.(sprintf('AnchoredReorderingIndex%.fmslag', lagval)); 
+                    end
+                end
+
+                % note here the Params from expData is not used because there
+                % is a variable I want to preserve between runs... may come
+                % up with a better solution down the line...
+                % TODO: remove the analysis step in the function, already
+                % dealt with earlier
+                NetMet = plotNodeCartography(expData.adjMs, Params, expData.NetMet, expData.Info, originalCoords, originalChannels, ...
+                    HomeDir, fileNameFolder, oneFigureHandle);
+                % save NetMet now that we have node cartography data as well
+                experimentMatFileFolderToSaveTo = fullfile(Params.outputDataFolder, strcat('OutputData', Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
+                experimentMatFilePathToSaveTo = fullfile(experimentMatFileFolderToSaveTo, strcat(char(expData.Info.FN),'_',Params.Date,'.mat'));
+
+                spikeTimes = expData.spikeTimes;
+                Ephys = expData.Ephys;
+                adjMs = expData.adjMs;
+                Info = expData.Info;
+                save(experimentMatFilePathToSaveTo,'Info','Params','spikeTimes','Ephys','adjMs','NetMet')
+
+                % save the current in use reordering index 
+                for lagval = Params.FuncConLagval
+                    tempNetMet.(sprintf('AnchoredReorderingIndex%.fmslag', lagval)) = NetMet.(sprintf('AnchoredReorderingIndex%.fmslag', lagval)); 
+                end
+            end
+        end
     end 
     
-    % Plot node cartography metrics across all recordings 
-    NetMetricsE = {'Dens','Q','nMod','Eglob','aN','CC','PL','SW','SWw', ... 
-               'Hub3','Hub4', 'NCpn1','NCpn2','NCpn3','NCpn4','NCpn5','NCpn6'}; 
-    NetMetricsC = {'ND','MEW','NS','Eloc','BC','PC','Z'};
-    combinedData = combineExpNetworkData(ExpName, Params, NetMetricsE, ...
-        NetMetricsC, HomeDir, experimentMatFileFolderToSaveTo);
-    figFolder = fullfile(Params.outputDataFolder, strcat('OutputData', Params.Date, Params.NewFNsuffix), ...
-        '4_NetworkActivity', '4B_GroupComparisons', '6_NodeCartographyByLag');
-    plotNetMetNodeCartography(combinedData, ExpName,Params, HomeDir, figFolder, oneFigureHandle)
-    
-
-   
 
 end
 
@@ -636,19 +751,25 @@ if any(strcmp(Params.optionalStepsToRun,'getDensityLandscape'))
     end 
 end 
 
-%% Optional step: statistics and classification of genotype / ages 
-if any(strcmp(Params.optionalStepsToRun,'runStats'))
+%% Optional step: statistics and classification of genotype / ages
+% Statistics and machine learning settings 
+% Params.classificationTarget = 'AgeDiv';  % which property of the recordings to classify 
+Params.classification_models = {'linearSVM', 'kNN', 'decisionTree', 'LDA'}; % 'fforwardNN'
+Params.regression_models = {'svmRegressor', 'regressionTree', 'ridgeRegression', 'fforwardNN'};
+Params.statsRandomSeed = 1;
+
+if any(strcmp(Params.optionalStepsToRun,'Stats'))
     if Params.showOneFig
         if ~isfield(Params, 'oneFigure')
             Params.oneFigure = figure;
         end 
     end 
     
-    if Params.priorAnalysis 
+    if Params.priorAnalysis && Params.startAnalysisStep >= 5
         statsDataFolder = Params.priorAnalysisPath;
     else
         statsDataFolder = fullfile(Params.outputDataFolder, ...
-                strcat('OutputData',Params.Date, Params.NewFNsuffix));
+                strcat('OutputData',Params.Date, Params.NewFNSuffix));
     end 
     
     nodeLevelFile = fullfile(statsDataFolder, 'NetworkActivity_NodeLevel.csv');
@@ -657,12 +778,30 @@ if any(strcmp(Params.optionalStepsToRun,'runStats'))
     recordingLevelFile = fullfile(statsDataFolder, 'NetworkActivity_RecordingLevel.csv');
     recordingLevelData = readtable(recordingLevelFile);
     
+    %{
+    if sum(ismember(recordingLevelData.Properties.VariableNames, 'AgeDiv')) == 0 
+        if sum(ismember(recordingLevelData.Properties.VariableNames, 'DIV')) == 1
+            recordingLevelData.AgeDiv = recordingLevelData.DIV;
+        end 
+    end 
+
+    if sum(ismember(recordingLevelData.Properties.VariableNames, 'eGrp')) == 0 
+        if sum(ismember(recordingLevelData.Properties.VariableNames, 'Grp')) == 1
+            recordingLevelData.eGrp = recordingLevelData.Grp;
+        end 
+    end 
+    %}
+
     % Traditional Statistics
     statsTable = doStats(0, recordingLevelData, Params);
     statsTableSavePath = fullfile(statsDataFolder, 'stats.csv');
     writetable(statsTable, statsTableSavePath);
     oneFigureHandle = NaN;
     oneFigureHandle = checkOneFigureHandle(Params, oneFigureHandle);
+    plotSaveFolder = fullfile(statsDataFolder, '5_Stats');
+    if ~isfolder(plotSaveFolder)
+        mkdir(plotSaveFolder)
+    end 
     plotStats(statsTable, plotSaveFolder, Params, oneFigureHandle)
     
     % Classification and Regression 
@@ -673,7 +812,7 @@ if any(strcmp(Params.optionalStepsToRun,'runStats'))
         end 
         featureCorrelation(nodeLevelData, recordingLevelData, Params, lag_val, plotSaveFolder);
         doLDA(recordingLevelData, Params, lag_val);
-        doClassification(recordingLevelData, Params, lag_val, plotSaveFolder);
+        doClassification(recordingLevelData, Params, lag_val, plotSaveFolder, oneFigureHandle);
     end 
 
 
@@ -684,14 +823,14 @@ if any(strcmp(Params.optionalStepsToRun,'combineDIVplots'))
     if Params.priorAnalysis == 1
         featureFolder = fullfile(Params.priorAnalysisPath, '4_NetworkActivity', '4A_IndividualNetworkAnalysis');
     else
-        featureFolder = fullfile(Params.outputDataFolder, ['OutputData' Params.Date Params.NewFNsuffix], '4_NetworkActivity', '4A_IndividualNetworkAnalysis');
+        featureFolder = fullfile(Params.outputDataFolder, ['OutputData' Params.Date Params.NewFNSuffix], '4_NetworkActivity', '4A_IndividualNetworkAnalysis');
     end 
     featureFolderSearch = dir(featureFolder);
     dirFlags = [featureFolderSearch.isdir];
     folderNames = {featureFolderSearch.name};
     groupFolders = folderNames(dirFlags);
     groupFolders = groupFolders(~ismember(groupFolders, {'.', '..'}));
-    combinedPlotFolder = fullfile(Params.outputDataFolder, ['OutputData' Params.Date Params.NewFNsuffix], ...
+    combinedPlotFolder = fullfile(Params.outputDataFolder, ['OutputData' Params.Date Params.NewFNSuffix], ...
         '4_NetworkActivity', '4B_GroupComparisons', '8_CombinedPlotsByDiv');
     if 1 - isfolder(combinedPlotFolder)
         mkdir(combinedPlotFolder)
@@ -705,7 +844,7 @@ if any(strcmp(Params.optionalStepsToRun,'combineDIVplots'))
     end 
     
     Params.includeIdvScaledPlotsInCombinedPlots = 1;
-    Params.plotNames = {'3_scaled_MEA_NetworkPlotNodedegreeBetweenesscentrality.png', ...
+    Params.plotNames = {'3_scaled_MEA_NetworkPlotNodedegreeBetweennesscentrality.png', ...
                         '4_scaled_MEA_NetworkPlotNodedegreeParticipationcoefficient.png', ...
                         '5_scaled_MEA_NetworkPlotNodestrengthLocalefficiency.png', ...
                         '7_scaled_MEA_NetworkPlotNodedegreeAveragecontrollability.png', ... 
@@ -804,11 +943,11 @@ if any(strcmp(Params.optionalStepsToRun,'comparePrePostTTX'))
     
     
     % Get spike detection result folder
-    spike_folder = strcat(HomeDir,'/OutputData',Params.Date, Params.NewFNsuffix,'/1_SpikeDetection/1A_SpikeDetectedData/');
+    spike_folder = strcat(HomeDir,'/OutputData',Params.Date, Params.NewFNSuffix,'/1_SpikeDetection/1A_SpikeDetectedData/');
     spike_folder(strfind(spike_folder,'\'))='/';
     
     pre_post_ttx_plot_folder = fullfile(HomeDir, 'OutputData', ... 
-        Params.Date, Params.NewFNsuffix, '1_SpikeDetection', '1C_prePostTTXcomparison'); 
+        Params.Date, Params.NewFNSuffix, '1_SpikeDetection', '1C_prePostTTXcomparison'); 
     
     find_best_spike_result(spike_folder, pre_post_ttx_plot_folder, Params)
 end 

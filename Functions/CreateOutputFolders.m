@@ -1,4 +1,4 @@
-function [] = CreateOutputFolders(HomeDir, OutputDataFolder, Date, GrpNm, NewFNsuffix)
+function [] = CreateOutputFolders(HomeDir, OutputDataFolder, Date, GrpNm, NewFNSuffix)
 % this function creates the following output folder structure:
 %
 %   OutputData+Date
@@ -21,14 +21,14 @@ function [] = CreateOutputFolders(HomeDir, OutputDataFolder, Date, GrpNm, NewFNs
 cd(OutputDataFolder)
 
 %% create output folder
-outputDataDateFolder = fullfile(OutputDataFolder, strcat('OutputData', Date,char(NewFNsuffix)));
+outputDataDateFolder = fullfile(OutputDataFolder, strcat('OutputData', Date,char(NewFNSuffix)));
 assert(~exist(outputDataDateFolder, 'file'), [outputDataDateFolder ' already exists.']);
 spikeDetectionFolder = fullfile(outputDataDateFolder, '1_SpikeDetection');
 neuronalActivityFolder = fullfile(outputDataDateFolder, '2_NeuronalActivity');
-disp(['Name of Output Data Folder: OutputData',Date,char(NewFNsuffix)]);
+disp(['Name of Output Data Folder: OutputData',Date,char(NewFNSuffix)]);
 
-mkdir(strcat('OutputData',Date,char(NewFNsuffix)))
-cd(strcat('OutputData',Date,char(NewFNsuffix)))
+mkdir(strcat('OutputData',Date,char(NewFNSuffix)))
+cd(strcat('OutputData',Date,char(NewFNSuffix)))
 mkdir('ExperimentMatFiles')
 mkdir('1_SpikeDetection')
 cd('1_SpikeDetection')
@@ -38,7 +38,7 @@ cd('1B_SpikeDetectionChecks')
 for i = 1:length(GrpNm)
     mkdir(char(GrpNm{i}))
 end
-cd(OutputDataFolder); cd(strcat('OutputData',Date,char(NewFNsuffix)));
+cd(OutputDataFolder); cd(strcat('OutputData',Date,char(NewFNSuffix)));
 mkdir('2_NeuronalActivity')
 cd('2_NeuronalActivity')
 mkdir('2A_IndividualNeuronalAnalysis')
@@ -46,7 +46,7 @@ cd('2A_IndividualNeuronalAnalysis')
 for i = 1:length(GrpNm)
     mkdir(char(GrpNm{i}))
 end
-cd(OutputDataFolder); cd(strcat('OutputData',Date,char(NewFNsuffix))); cd('2_NeuronalActivity')
+cd(OutputDataFolder); cd(strcat('OutputData',Date,char(NewFNSuffix))); cd('2_NeuronalActivity')
 mkdir('2B_GroupComparisons')
 cd('2B_GroupComparisons')
 mkdir('1_NodeByGroup')
@@ -55,14 +55,14 @@ mkdir('3_RecordingsByGroup')
 cd('3_RecordingsByGroup')
 mkdir('HalfViolinPlots')
 mkdir('NotBoxPlots')
-cd(OutputDataFolder); cd(strcat('OutputData',Date,char(NewFNsuffix))); 
+cd(OutputDataFolder); cd(strcat('OutputData',Date,char(NewFNSuffix))); 
 cd('2_NeuronalActivity'); cd('2B_GroupComparisons')
 mkdir('4_RecordingsByAge')
 cd('4_RecordingsByAge')
 mkdir('HalfViolinPlots')
 mkdir('NotBoxPlots')
 cd(OutputDataFolder)
-cd(strcat('OutputData',Date,char(NewFNsuffix)))
+cd(strcat('OutputData',Date,char(NewFNSuffix)))
 mkdir('3_EdgeThresholdingCheck')
 mkdir('4_NetworkActivity')
 cd('4_NetworkActivity')
@@ -71,7 +71,7 @@ cd('4A_IndividualNetworkAnalysis')
 for i = 1:length(GrpNm)
     mkdir(char(GrpNm{i}))
 end
-cd(OutputDataFolder); cd(strcat('OutputData',Date,char(NewFNsuffix))); cd('4_NetworkActivity')
+cd(OutputDataFolder); cd(strcat('OutputData',Date,char(NewFNSuffix))); cd('4_NetworkActivity')
 mkdir('4B_GroupComparisons')
 cd('4B_GroupComparisons')
 mkdir('1_NodeByGroup')
@@ -80,17 +80,17 @@ mkdir('3_RecordingsByGroup')
 cd('3_RecordingsByGroup')
 mkdir('HalfViolinPlots')
 mkdir('NotBoxPlots')
-cd(OutputDataFolder); cd(strcat('OutputData',Date,char(NewFNsuffix))); 
+cd(OutputDataFolder); cd(strcat('OutputData',Date,char(NewFNSuffix))); 
 cd('4_NetworkActivity'); cd('4B_GroupComparisons')
 mkdir('4_RecordingsByAge')
 cd('4_RecordingsByAge')
 mkdir('HalfViolinPlots')
 mkdir('NotBoxPlots')
-cd(OutputDataFolder); cd(strcat('OutputData',Date,char(NewFNsuffix))); 
+cd(OutputDataFolder); cd(strcat('OutputData',Date,char(NewFNSuffix))); 
 cd('4_NetworkActivity'); cd('4B_GroupComparisons')
 mkdir('5_GraphMetricsByLag')
 mkdir('6_NodeCartographyByLag')
 cd(HomeDir)
-addpath(genpath(fullfile(OutputDataFolder, strcat('OutputData',Date,char(NewFNsuffix)))))
+addpath(genpath(fullfile(OutputDataFolder, strcat('OutputData',Date,char(NewFNSuffix)))))
 
 end

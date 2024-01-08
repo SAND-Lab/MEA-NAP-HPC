@@ -39,13 +39,16 @@ function [] = StandardisedNetworkPlotNodeCartography(adjM, coords, edge_thresh, 
 %% plot
 p =  [50 100 700 550];
 
-if ~Params.showOneFig
-    F1 = figure;
-    F1.OuterPosition = p;
-else 
-    % set(0, 'DefaultFigurePosition', p)
-    % Params.oneFigure.OuterPosition = p;
-    set(oneFigureHandle, 'OuterPosition', p);
+if Params.showOneFig
+    if isgraphics(oneFigureHandle)
+        set(oneFigureHandle, 'OuterPosition', p);
+    else 
+        oneFigureHandle = figure;
+        set(oneFigureHandle, 'OuterPosition', p);
+    end 
+else
+   F1 = figure;
+   F1.OuterPosition = p;
 end 
 
 aesthetics; axis off; hold on
@@ -88,6 +91,8 @@ if strcmp(plotType,'MEA')
     colourT = colour(order,:);
     xcot = xco(order,:);
     ycot = yco(order,:);
+    
+    % TODO: this does not require a loop I think... 
     for u = 1:length(xcot)
         plot(xcot(u,:),ycot(u,:),'LineWidth',lineWidthT(u),'Color',colourT(u,:));
     end
@@ -204,14 +209,8 @@ nodeTypeColors = [0.8 0.902 0.310; ... % light green
                   0.2 0.729 0.949; ... % light blue
                   0.078 0.424 0.835; ... % medium blue
                   0.016 0.235 0.498; ... % dark blue
+                  0 0 0; ... % black for inactive nodes
                   ];
-
-%c1 = [0.8 0.902 0.310]; % light green
-%c2 = [0.580 0.706 0.278]; % medium green
-%c3 = [0.369 0.435 0.122]; % dark green
-%c4 = [0.2 0.729 0.949]; % light blue
-%c5 = [0.078 0.424 0.835]; % medium blue
-%c6 = [0.016 0.235 0.498]; % dark blue
 
 if strcmp(plotType,'MEA')
     uniqueXc = sort(unique(xc));
@@ -224,7 +223,6 @@ if strcmp(plotType,'MEA')
 
         % Add channel numbers on top of the nodes
         if Params.includeChannelNumberInPlots 
-            pos = [xc(i)  yc(i)];
             text(pos(1), pos(2), sprintf('%.f', Params.netSubsetChannels(i)), ...
                 'HorizontalAlignment','center')
         end 
@@ -243,6 +241,12 @@ if strcmp(plotType,'circular')
         Colour = nodeTypeColors(NdCartDiv(i), :);
         pos = [cos(t(i))-(0.5*nodeScaleF) sin(t(i))-(0.5*nodeScaleF) nodeScaleF nodeScaleF];
         rectangle('Position',pos,'Curvature',[1 1],'FaceColor',Colour,'EdgeColor','w','LineWidth',0.1)
+        
+         % Add channel numbers on top of the nodes
+        if Params.includeChannelNumberInPlots 
+            text(pos(1)+(0.5*nodeScaleF), pos(2)+(0.5*nodeScaleF), sprintf('%.f', Params.channelsReordered(i)), ...
+                'HorizontalAlignment','center', 'VerticalAlignment','middle', 'Color','white','FontSize',7)
+        end 
     end
     ylim([-1.1 1.1])
     xlim([-1.1 1.9])
