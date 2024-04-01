@@ -8,7 +8,7 @@ verbose = 0;  % 1 : prints out status, 0 : keep quiet
 
 
 % set firing rate threshold in Hz
-FR_threshold = 0.1; % in Hz or spikes/s
+FR_threshold = 0.01; % in Hz or spikes/s
 % get spike counts
 FiringRates = full(sum(spikeMatrix))/Info.duration_s;
 
@@ -110,14 +110,13 @@ else
         disp('no bursts detected')
     end 
     sp_in_bst=0;
-    
     Ephys.meanNBstLengthS = nan; % mean length burst in s
-    Ephys.numNbursts = nan;
+    Ephys.numNbursts = 0;
     Ephys.meanNumChansInvolvedInNbursts = nan;
     Ephys.meanISIWithinNbursts_ms = nan;
     Ephys.meanISIoutsideNbursts_ms = nan;
     Ephys.CVofINBI = nan; %3 decimal places
-    Ephys.NBurstRate = nan;
+    Ephys.NBurstRate = 0;
     Ephys.fracInNburst = nan;
     
 end

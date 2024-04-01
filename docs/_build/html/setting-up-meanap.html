@@ -2,11 +2,11 @@
 <html class="no-js" lang="en" data-content_root="./">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Guide for New Users" href="guide-for-new-users.html" /><link rel="prev" title="Setting up MATLAB" href="setting-up-matlab.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>Setting up MEA-NAP - MEA pipeline 1.5.1 documentation</title>
+    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+        <title>Setting up MEA-NAP - MEA pipeline 1.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="_static/css/tooltipster.custom.css" />
@@ -131,7 +131,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">MEA pipeline 1.5.1 documentation</div></a>
+      <a href="index.html"><div class="brand">MEA pipeline 1.6.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -142,7 +142,7 @@
           <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
         </button>
       </div>
-      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
         <div class="visually-hidden">Toggle table of contents sidebar</div>
         <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
       </label>
@@ -154,7 +154,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">MEA pipeline 1.5.1 documentation</span>
+  <span class="sidebar-brand-text">MEA pipeline 1.6.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -175,6 +175,7 @@
 <li class="toctree-l1"><a class="reference internal" href="frequently-asked-questions.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to-contribute.html">Contributing to the Project</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sources.html">Code Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citing-MEANAP.html">Citing MEA-NAP</a></li>
 </ul>
 
 </div>
@@ -203,7 +204,7 @@
               <svg class="theme-icon-when-light"><use href="#svg-sun"></use></svg>
             </button>
           </div>
-          <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <label class="toc-overlay-icon toc-content-icon" for="__toc">
             <div class="visually-hidden">Toggle table of contents sidebar</div>
             <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
           </label>
@@ -211,8 +212,8 @@
         <article role="main">
           <section id="setting-up-mea-nap">
 <h1>Setting up MEA-NAP<a class="headerlink" href="#setting-up-mea-nap" title="Link to this heading">#</a></h1>
-<ol class="arabic">
-<li><p><strong>Download MEA-NAP folder from GitHub</strong>:</p>
+<section id="download-mea-nap-folder-from-github">
+<h2>1. Download MEA-NAP folder from GitHub:<a class="headerlink" href="#download-mea-nap-folder-from-github" title="Link to this heading">#</a></h2>
 <ul class="simple">
 <li><p>Navigate to the home page of the MEA-NAP GitHub repository using your web browser.</p></li>
 </ul>
@@ -222,57 +223,63 @@
 <li><p>In the dropdown menu, select the <strong>“Download ZIP” option.</strong> This will prompt GitHub to compress the latest version of the MEA-NAP repository into a zip folder.</p></li>
 <li><p>Once the zip folder is downloaded, navigate to the location where you saved it and extract its contents.</p></li>
 </ul>
-</li>
-<li><p><strong>Prepare your data for MEA-NAP</strong>:</p>
+</section>
+<section id="prepare-your-data-for-mea-nap">
+<h2>2. Prepare your data for MEA-NAP:<a class="headerlink" href="#prepare-your-data-for-mea-nap" title="Link to this heading">#</a></h2>
+<p>Ensure that all relevant recordings that you want to analyze are saved in the same folder (no subfolders). This will allow MEA-NAP to seamlessly process and compare the data during the analysis.</p>
+<ul class="simple">
+<li><p>Keep all the recording files intended for a specific batch analysis in a dedicated folder.</p></li>
+<li><p>Maintain a concise and consistent naming convention for the files in the batch analysis folder.</p></li>
+<li><p>As filenames and group names are included in many plots, it is important to keep the names concise and informative (e.g., NGN2230101_P1_A1_DIV14, where</p></li>
+<li><p>NGN2 is the experiment code, 230101 is the date the culture was started, P1_A1 is the plate and well number, and DIV14 is the age).</p></li>
+<li><p>Rename your files, if necessary, before converting your data to MATLAB format for MEA-NAP.</p></li>
+</ul>
+</section>
+<section id="convert-your-data-to-matlab-format-for-mea-nap">
+<h2>3. Convert your data to MATLAB format for MEA-NAP:<a class="headerlink" href="#convert-your-data-to-matlab-format-for-mea-nap" title="Link to this heading">#</a></h2>
 <p>The MEA-NAP pipeline is currently optimized for single MEA recordings made on the Multichannel Systems MEA2100 60-channel MEA system and for multi-well plates using the Axion Maestro MEA System. However, these recordings must be converted to <cite>*.mat</cite> files first.</p>
 <ul>
-<li><p><strong>Converting .mcd files acquired from a Multichannel Systems MEA system with MC_Rack to .mat files</strong>:</p>
+<li><p><strong>Converting .mcd files acquired from a Multichannel Systems MEA system with MC_Rack to .raw files:</strong></p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><p>Open MC_DataTool.</p></li>
 <li><p>Select File - Open Multiple.</p></li>
-<li><p>Choose files of interest.</p></li>
+<li><p>Choose .mcd files of interest.</p></li>
 <li><p>Click “bin.”</p></li>
 <li><p>Click “All.”</p></li>
 <li><p>Ensure “Write header” and “Signed 16bit” are checked in the lower right.</p></li>
-<li><p>Click save.</p></li>
+<li><p>Click “save” to save .raw files that are generated.</p></li>
 <li><p>When done, click close.</p></li>
-<li><p>Open MATLAB.</p></li>
-<li><p>Add the analysis pipeline code to the path.</p></li>
-<li><p>Navigate in MATLAB to the folder containing the “.mcd” files you want to convert.</p></li>
-<li><p>In the MATLAB command window, type <code class="docutils literal notranslate"><span class="pre">MEAbatchConvert</span></code> and press return to run.</p></li>
 </ol>
 </div></blockquote>
 </li>
-<li><p><strong>Converting .raw files acquired from an Axion Maestro MEA system to .mat files</strong>:</p>
+<li><p><strong>Converting .raw files acquired from Multichannel Systems or Axion Maestro MEA systems to .mat files for MEA-NAP:</strong></p>
 <blockquote>
 <div><ol class="arabic simple">
-<li><p>Save <cite>.raw</cite> files from MEA Axion Maestro system to one folder.</p></li>
-<li><p>Copy the directory path of the folder containing <cite>.raw</cite> files.</p></li>
-<li><p>Verify that <cite>rawConvert.m</cite> and <cite>fillBatchFile.m</cite> are installed and saved in the same folder as AxIS MATLAB Files.</p></li>
-<li><p>Open <cite>rawConvert.m</cite>.</p></li>
-<li><p>Fill out user parameters in <cite>rawConvert.m</cite> according to instructions provided in <cite>rawConvert.m</cite>.</p></li>
-<li><p>Click run.</p></li>
-<li><p>When <cite>rawConvert.m</cite> has successfully run, open the folder where <cite>.raw</cite> files were initially stored.</p></li>
-<li><p>Navigate through the folder to check that all <cite>.mat</cite> files have been successfully created and saved.</p></li>
+<li><p>Open MATLAB.</p></li>
+<li><p>Open MEApipeline.m.</p></li>
+<li><p>Start GUI by clicking green “Run” button in the Editor submenu at the top of your screen.</p></li>
+<li><p>In the GUI, navigate to the File Conversion tab.</p></li>
+</ol>
+<a class="reference internal image-reference" href="_images/axion_file_conversion_gui.png"><img alt="File Conversion tab in GUI" class="align-center" src="_images/axion_file_conversion_gui.png" style="width: 400px;" /></a>
+<ol class="arabic simple" start="5">
+<li><p>For File Type, select “.raw from Axion Maestro” for Axion data or “.raw from Multichannel Systems.”</p></li>
+<li><p>Click select button to select the Data Folder where your .raw data is.  All of your data must be in the same folder.</p></li>
+<li><p>Chose an informative name for your batch CVS file for this experiment.</p></li>
+<li><p>If the age is included in the .raw filenames as “DIV” followed by the age in numbers (e.g., “DIV21”), check box to automatically have the age populated in the batch CSV file.</p></li>
+<li><p>If you only have one group, check box “One Group?” and enter the desired group name in the box. The group name must start with a letter and should be short (e.g., NGN2).</p></li>
+<li><p>Click Run file conversion. This may take some time depending on the number and size of the files. When it is done, “Conversion Complete” will appear in the MEA-NAP Status on the right side of the GUI.</p></li>
 </ol>
 </div></blockquote>
 </li>
-<li><p><strong>Organizing data</strong>:</p></li>
 </ul>
-<dl class="simple">
-<dt>After preparing your data, it is essential to organize the <cite>.mat</cite> files you plan to analyze in a batch. Ensure that all relevant <cite>.mat</cite> files are saved in the same folder. This organized structure is crucial for the MEA-NAP pipeline to seamlessly process and compare the data during the analysis.</dt><dd><ul class="simple">
-<li><p>Keep all the <cite>.mat</cite> files intended for a specific batch analysis in a dedicated folder.</p></li>
-<li><p>Maintain a concise and consistent naming convention for these batch analysis folders.</p></li>
-<li><p>As filenames and group names are included in many plots, it is important to keep the names concise and informative (e.g., NGN2230101_P1_A1_DIV14, where
-NGN2 is the experiment code, 230101 is the date the culture was started, P1_A1 is the plate and well number, and DIV14 is the age).</p></li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p><strong>Prepare batch analysis CSV file</strong>:</p>
-<ul id="prepare-batch-analysis-csv-file">
-<li><p>Create a <code class="docutils literal notranslate"><span class="pre">*.csv</span></code> or <code class="docutils literal notranslate"><span class="pre">*.xlsx</span></code> file with the following columns:</p>
+</section>
+<section id="prepare-batch-analysis-csv-file">
+<h2>4. Prepare batch analysis CSV file:<a class="headerlink" href="#prepare-batch-analysis-csv-file" title="Link to this heading">#</a></h2>
+<p id="id1">The File Conversion on the GUI will create a batch CSV file with a list of all the recording names in your data folder.</p>
+<ul>
+<li><p>Open the batch CSV in another application that can read spreadsheets.</p></li>
+<li><p>Ensure the following columns in the CSV file are filled out correctly for your data:</p>
 <blockquote>
 <div><ol class="arabic simple">
 <li><p><strong>Recording filename</strong>: column containing filenames of the <code class="docutils literal notranslate"><span class="pre">*.mat</span></code> files for analysis, excluding extension (.mat).</p></li>
@@ -286,9 +293,8 @@ NGN2 is the experiment code, 230101 is the date the culture was started, P1_A1 i
 <p>Here is an example spreadsheet in CSV format opened in Microsoft Excel.</p>
 <a class="reference internal image-reference" href="_images/example-spreadsheet-input.png"><img alt="_images/example-spreadsheet-input.png" class="align-center" src="_images/example-spreadsheet-input.png" style="width: 500px;" /></a>
 <div style="margin-bottom: 20px;"></div><p><strong>Note:</strong> If you using Axion Maestro MEA data, rawConvert.m will generate a batch analysis csv file for you. However, <strong>you will still need to be modify the columns based on the descriptions above.</strong></p>
-</li>
-</ol>
 <p>Congratulations! With the completion of the data preparation steps outlined above, your data is now ready for analysis using MEA-NAP.</p>
+</section>
 </section>
 
         </article>
@@ -320,7 +326,7 @@ NGN2 is the experiment code, 230101 is the date the culture was started, P1_A1 i
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2022, Timothy Sit, Rachael Feord, Alexander Dunn, Jeremy Chabros, Mierau SB and SAND group members
+                Copyright &#169; 2022, Timothy Sit, Rachael Feord, Alexander Dunn, Jeremy Chabros, Susanna Mierau, and SAND group members
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -334,15 +340,37 @@ NGN2 is the experiment code, 230101 is the date the culture was started, P1_A1 i
         
       </footer>
     </div>
-    <aside class="toc-drawer no-toc">
+    <aside class="toc-drawer">
       
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            On this page
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Setting up MEA-NAP</a><ul>
+<li><a class="reference internal" href="#download-mea-nap-folder-from-github">1. Download MEA-NAP folder from GitHub:</a></li>
+<li><a class="reference internal" href="#prepare-your-data-for-mea-nap">2. Prepare your data for MEA-NAP:</a></li>
+<li><a class="reference internal" href="#convert-your-data-to-matlab-format-for-mea-nap">3. Convert your data to MATLAB format for MEA-NAP:</a></li>
+<li><a class="reference internal" href="#prepare-batch-analysis-csv-file">4. Prepare batch analysis CSV file:</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
       
       
     </aside>
   </div>
 </div><script src="_static/jquery.js?v=5d32c60e"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-    <script src="_static/documentation_options.js?v=44dfd65d"></script>
+    <script src="_static/documentation_options.js?v=72d88caf"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>

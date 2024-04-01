@@ -248,7 +248,7 @@ end
 
 %% export to spreadsheet (excel or csv)
 
-outputDataFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNSuffix));
+outputDataFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date,Params.NewFNSuffix));
 
 if strcmp(output_spreadsheet_file_type, 'csv')
     % make one main table for storing all data 
@@ -256,61 +256,62 @@ if strcmp(output_spreadsheet_file_type, 'csv')
     n_row = 1; 
 end 
 
-
-% network means
-for g = 1:length(Grps)
-    eGrp = cell2mat(Grps(g));
-    for d = 1:length(AgeDiv)
-        eDiv = strcat('TP',num2str(d));
-        VNe = strcat(eGrp,'.',eDiv);
-        % VNe = eGrp.(eDiv);
-        VNet = strcat('TempStr.',eDiv);
-        for l = 1:length(Params.FuncConLagval)
-            for e = 1:length(NetMetricsE)
-                % Only do the asignment if metricVal is not empty
-                eval(['metricVal' '=' VNe '.' char(NetMetricsE(e)) ';'])
-                if length(metricVal) ~= 0
-                    eval([VNet '.' char(NetMetricsE(e)) '='  'metricVal(:,l);']);
-                else 
-                    eval([VNet '.' char(NetMetricsE(e)) '='  '0;']);
+if length(NetMetricsE) >= 1
+    % network means
+    for g = 1:length(Grps)
+        eGrp = cell2mat(Grps(g));
+        for d = 1:length(AgeDiv)
+            eDiv = strcat('TP',num2str(d));
+            VNe = strcat(eGrp,'.',eDiv);
+            % VNe = eGrp.(eDiv);
+            VNet = strcat('TempStr.',eDiv);
+            for l = 1:length(Params.FuncConLagval)
+                for e = 1:length(NetMetricsE)
+                    % Only do the asignment if metricVal is not empty
+                    eval(['metricVal' '=' VNe '.' char(NetMetricsE(e)) ';'])
+                    if length(metricVal) ~= 0
+                        eval([VNet '.' char(NetMetricsE(e)) '='  'metricVal(:,l);']);
+                    else 
+                        eval([VNet '.' char(NetMetricsE(e)) '='  '0;']);
+                    end 
+                    % netMetricToGet = char(NetMetricsE(e));
+                    % VNet.(netMetricToGet) = VNe.(netMetricToGet)
+                end
+                eval(['DatTemp = ' VNet ';']); 
+                if strcmp(output_spreadsheet_file_type, 'csv')
+                    %numEntries = length(DatTemp.(NetMetricsE{1}));
+                    DatTempFieldNames = fieldnames(DatTemp);
+                    numEntries = length(DatTemp.(DatTempFieldNames{1}));
+                    DatTemp.eGrp = repmat(convertCharsToStrings(eGrp), numEntries, 1);
+                    DatTemp.AgeDiv = repmat(AgeDiv(d), numEntries, 1);
+                    DatTemp.Lag = repmat(Params.FuncConLagval(l), numEntries, 1);
+                    table_obj = struct2table(DatTemp);
+                    for table_row = 1:numEntries
+                        main_table{n_row} = table_obj(table_row, :);
+                        n_row = n_row + 1;
+                    end 
+                else
+                    table_obj = struct2table(DatTemp);
                 end 
-                % netMetricToGet = char(NetMetricsE(e));
-                % VNet.(netMetricToGet) = VNe.(netMetricToGet)
+
+                if strcmp(output_spreadsheet_file_type, 'excel')
+                    table_savename = strcat('NetworkActivity_RecordingLevel_',eGrp,'.xlsx');
+                    table_savepath = fullfile(outputDataFolder, table_savename);
+                    writetable(table_obj, table_savepath, ... 
+                        'FileType','spreadsheet','Sheet', ... 
+                        strcat('Age',num2str(AgeDiv(d)), ... 
+                        'Lag',num2str(Params.FuncConLagval(l)),'ms'));
+                end 
             end
-            eval(['DatTemp = ' VNet ';']); 
-            if strcmp(output_spreadsheet_file_type, 'csv')
-                %numEntries = length(DatTemp.(NetMetricsE{1}));
-                DatTempFieldNames = fieldnames(DatTemp);
-                numEntries = length(DatTemp.(DatTempFieldNames{1}));
-                DatTemp.eGrp = repmat(convertCharsToStrings(eGrp), numEntries, 1);
-                DatTemp.AgeDiv = repmat(AgeDiv(d), numEntries, 1);
-                DatTemp.Lag = repmat(Params.FuncConLagval(l), numEntries, 1);
-                table_obj = struct2table(DatTemp);
-                for table_row = 1:numEntries
-                    main_table{n_row} = table_obj(table_row, :);
-                    n_row = n_row + 1;
-                end 
-            else
-                table_obj = struct2table(DatTemp);
-            end 
-
-            if strcmp(output_spreadsheet_file_type, 'excel')
-                table_savename = strcat('NetworkActivity_RecordingLevel_',eGrp,'.xlsx');
-                table_savepath = fullfile(outputDataFolder, table_savename);
-                writetable(table_obj, table_savepath, ... 
-                    'FileType','spreadsheet','Sheet', ... 
-                    strcat('Age',num2str(AgeDiv(d)), ... 
-                    'Lag',num2str(Params.FuncConLagval(l)),'ms'));
-            end 
         end
     end
-end
 
-if strcmp(output_spreadsheet_file_type, 'csv')
-    combined_table = vertcat(main_table{:});
-    table_savepath = fullfile(outputDataFolder, ...
-        strcat('NetworkActivity_RecordingLevel.csv'));
-    writetable(combined_table, table_savepath);
+    if strcmp(output_spreadsheet_file_type, 'csv')
+        combined_table = vertcat(main_table{:});
+        table_savepath = fullfile(outputDataFolder, ...
+            strcat('NetworkActivity_RecordingLevel.csv'));
+        writetable(combined_table, table_savepath);
+    end 
 end 
 
 
@@ -383,7 +384,7 @@ clear DatTemp TempStr
 %% GraphMetricsByLag plots
 
 graphMetricByLagFolder = fullfile(Params.outputDataFolder, ... 
-    strcat('OutputData',Params.Date, Params.NewFNSuffix), '4_NetworkActivity', ...
+    strcat('OutputData',Params.Date,Params.NewFNSuffix), '4_NetworkActivity', ...
     '4B_GroupComparisons', '5_GraphMetricsByLag');
 
 eMet = Params.networkLevelNetMetToPlot;
@@ -493,7 +494,7 @@ end
 %% notBoxPlots - plots by group
 if Params.includeNotBoxPlots 
     networkNotBoxPlotFolder = fullfile(Params.outputDataFolder, ...
-        strcat('OutputData',Params.Date, Params.NewFNSuffix), '4_NetworkActivity', ...
+        strcat('OutputData',Params.Date,Params.NewFNSuffix), '4_NetworkActivity', ...
         '4B_GroupComparisons', '3_RecordingsByGroup', 'NotBoxPlots');
 
     eMet = Params.networkLevelNetMetToPlot;
@@ -598,7 +599,7 @@ end
 %% halfViolinPlots - plots by group
 
 halfViolinPlotByGroupFolder = fullfile(Params.outputDataFolder, ... 
-    strcat('OutputData',Params.Date, Params.NewFNSuffix), '4_NetworkActivity', ...
+    strcat('OutputData',Params.Date,Params.NewFNSuffix), '4_NetworkActivity', ...
     '4B_GroupComparisons', '3_RecordingsByGroup', 'HalfViolinPlots');
 
 eMet = Params.networkLevelNetMetToPlot;
@@ -707,7 +708,7 @@ end
 %% notBoxPlots - plots by DIV
 if Params.includeNotBoxPlots 
     notBoxPlotByDivFolder = fullfile(Params.outputDataFolder, ...
-        strcat('OutputData',Params.Date, Params.NewFNSuffix), '4_NetworkActivity', '4B_GroupComparisons', ...
+        strcat('OutputData',Params.Date,Params.NewFNSuffix), '4_NetworkActivity', '4B_GroupComparisons', ...
         '4_RecordingsByAge', 'NotBoxPlots');
 
     eMet = Params.networkLevelNetMetToPlot;
@@ -790,7 +791,7 @@ end
 
 %% halfViolinPlots - plots by DIV
 
-halfViolinPlotByDivFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNSuffix), ...
+halfViolinPlotByDivFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date,Params.NewFNSuffix), ...
     '4_NetworkActivity', '4B_GroupComparisons', '4_RecordingsByAge', 'HalfViolinPlots');
 
 eMet = Params.networkLevelNetMetToPlot;
@@ -902,7 +903,7 @@ end
    
 %% halfViolinPlots - plots by group electrode specific data
 
-nodeByGroupFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNSuffix), ...
+nodeByGroupFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date,Params.NewFNSuffix), ...
     '4_NetworkActivity', '4B_GroupComparisons', '1_NodeByGroup');
 
 eMet = Params.unitLevelNetMetToPlot; 
@@ -1008,7 +1009,7 @@ end
 
 %% halfViolinPlots - plots by DIV electrode specific data
 
-halfViolinPlotByAgeFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNSuffix), ...
+halfViolinPlotByAgeFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date,Params.NewFNSuffix), ...
     '4_NetworkActivity', '4B_GroupComparisons', '2_NodeByAge');
 
 eMet = Params.unitLevelNetMetToPlot; 

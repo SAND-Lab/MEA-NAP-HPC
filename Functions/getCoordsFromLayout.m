@@ -145,6 +145,18 @@ elseif strcmp(channelLayout, 'Axion64')
     coords(:, 1) = repelem(linspace(0, 1, 8), 1, 8);
 
 
+elseif strcmp(channelLayout, 'Axion16')
+
+    channels = [11, 12, 13, 14, ...
+        21, 22, 23, 24, ...
+        31, 32, 33, 34, ...
+        41, 42, 43, 44];
+
+    coords = zeros(length(channels), 2);
+    coords(:, 2) = repmat(linspace(0, 1, 4), 1, 4);
+    coords(:, 1) = repelem(linspace(0, 1, 4), 1, 4);
+
+
 
 elseif strcmp(channelLayout, 'Custom')
     % Here you can specify your own custom channel layout by 
@@ -166,7 +178,10 @@ elseif strcmp(channelLayout, 'Custom')
 
 end 
 
-coords  = coords * 8;  % Do not remove this line after specifying coordinate positions in (0 - 1 format)
+if strcmp(channelLayout, 'Axion16')
+    coords = coords * 4;
+else 
+    coords  = coords * 8;  % Do not remove this line after specifying coordinate positions in (0 - 1 format)
 
 end
 

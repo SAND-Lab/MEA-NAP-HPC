@@ -1,5 +1,8 @@
 MEA-NAP Outputs
 ===============
+
+Here is a list of the figures produced by MEA-NAP including sample figure legends. You can navigate to the different subfolders using these links:
+
 * :ref:`Step 1 - Spike Detection <Step 1 - Spike Detection>` 
 * :ref:`Step 1A – Spike Detection <Step 1A - Spike Detection Files>`
 * :ref:`Step 1B – Spike Detection Checks <Step 1A - Spike Detection Files>`
@@ -39,9 +42,9 @@ This folder contains the MATLAB file for each MEA recording with the spike times
 Each matlab file contains the following variables: 
 
 - Channels: a vector containing the numeric identified for each channel
-spikeDetectionResult: a structure containing the parameters used for spike detection (e.g., sampling rate)
+- spikeDetectionResult: a structure containing the parameters used for spike detection (e.g., sampling rate)
 - spikeTimes : a cell with an entry per channel, each cell entry contains a structure where the field names are the spike detection method and the field entries are the spike times in seconds 
-spikeWaveforms: same format as spikeTimes, but where each field entry are the spike waveforms detected
+- spikeWaveforms: same format as spikeTimes, but where each field entry are the spike waveforms detected
 - Thresholds: same format as spikeTimes, but where each field entry are the absolute values of the threshold used for spike detection (in mV), they are NaN values for wavelet detection methods as they do not rely on a threshold
 
 
@@ -57,7 +60,7 @@ This folder contains subfolders for each Group.  Each subfolder contains folders
 Subfolder – By Filename
 """"""""""""""""""""""""""""""
 
-**Figure 1. Example Traces.** Sample 60-millisecond-long filtered voltage traces from 9 electrodes (if the default number of electrodes to plot is selected in MEA-NAP) centered on at least one action potential. The electrode number and time in the recording are shown above each voltage trace, except for the bottom left trace which is labeled with the MEA recording filename. The colored arrows indicate where one or more spike detection methods and parameters identified an action potential.  Legend, bior1.3, bior1.5, and db2 are MATLAB wavelets used for template-based spike detection with the continuous wavelet transform. The median absolute deviation used for the threshold method is indicated with the prefix “thr.”  This figure facilitates comparing the performance of the spike detection methods and parameters at the electrode level.
+**Figure 1. Example Traces.** Sample 60-millisecond-long filtered voltage traces from 9 electrodes (if the default number of electrodes to plot is selected in MEA-NAP) centered on at least one action potential. The MEA recording filename is at the top of the figure.  The electrode number and time in the recording are shown above each voltage trace.  The colored arrows indicate where one or more spike detection methods and parameters identified an action potential.  Legend, bior1.3, bior1.5, and db2 are MATLAB wavelets used for template-based spike detection with the continuous wavelet transform. The median absolute deviation used for the threshold method is indicated with the prefix “thr.”  This figure facilitates comparing the performance of the spike detection methods and parameters at the individual electrode level.
 
 **Figure 2. Spike Frequencies.** Line graphs show the running spike frequency (binned by 1 second) detected by each spike detection method (line color) during the length of recording in minutes. Legend, bior1.3, bior1.5, and db2 are MATLAB wavelets used for template-based spike detection with the continuous wavelet transform. The median absolute deviation used for the threshold method is indicated with the prefix “thr.”  This figure facilitates comparing the performance of the spike detection methods and parameters at the electrode level. The figure title (top) indicates the MEA recording filename. This figure facilitates comparing the performance of the spike detection methods and parameters.
 
@@ -218,9 +221,9 @@ For each spike time tiling coefficient (STTC) lag used to determine the function
 
 **Figure 9. MEA Network Plot with the Node Cartography.** Graph of functional connectivity for an individual MEA recording (filename and STTC lag indicated in title).  The nodes (circles) represent the neuronal activity observed from neuron(s) at each electrode in the spatial arrangement of the MEA.  The node color represents the node cartography role. The edges (lines) represent significant functional connections between nodes, and the edge weight (line thickness) represents the strength of connectivity. 
 
-**Figure 9 MEA Network Plot with the Average Controllability.** Graph of functional connectivity for an individual MEA recording (filename and STTC lag indicated in title).  The nodes (circles) represent the neuronal activity observed from neuron(s) at each electrode in the spatial arrangement of the MEA.  The node color represents the average controllability, a metric of how much influence a node has over the overall network activity. The node degree (size of circle) represents the number of functional connections with other nodes.  The edges (lines) represent significant functional connections between nodes, and the edge weight (line thickness) represents the strength of connectivity. The average controllability color bar, size of the nodes and thickness of the edges are scaled based on the distributions in this recording.
-
 **Figure 9. Node Cartography for Adjacency Matrix by STTC Lag.** Diagram (top panel) shows how the node cartography role for each node (colored circles, legend on bottom left panel) are determined using the within-module degree z-score and participation coefficient for each node.  The boundaries (dashed lines) between roles were automatically set based on the distribution in the entire dataset. Network schema (bottom right panel) illustrates node cartography roles. Title of the figure is the MEA recording filename and the spike time tiling coefficient (STTC) lag used to create the adjacency matrix.
+
+**Figure 10 MEA Network Plot with the Average Controllability.** Graph of functional connectivity for an individual MEA recording (filename and STTC lag indicated in title).  The nodes (circles) represent the neuronal activity observed from neuron(s) at each electrode in the spatial arrangement of the MEA.  The node color represents the average controllability, a metric of how much influence a node has over the overall network activity. The node degree (size of circle) represents the number of functional connections with other nodes.  The edges (lines) represent significant functional connections between nodes, and the edge weight (line thickness) represents the strength of connectivity. The average controllability color bar, size of the nodes and thickness of the edges are scaled based on the distributions in this recording.
 
 **Figure 10. Scaled MEA Network Plot with the Average Controllability.** Graph of functional connectivity for an individual MEA recording (filename and STTC lag indicated in title).  The nodes (circles) represent the neuronal activity observed from neuron(s) at each electrode in the spatial arrangement of the MEA.  The node color represents the average controllability, a metric of how much influence a node has over the overall network activity. The node degree (size of circle) represents the number of functional connections with other nodes.  The edges (lines) represent significant functional connections between nodes, and the edge weight (line thickness) represents the strength of connectivity. The average controllability color bar, size of the nodes and thickness of the edges are scaled to the theoretical maximum and minimum to facilitate comparisons between MEA recordings.
 	
@@ -454,3 +457,12 @@ Step 5  – Statistical Comparisons
 There will be one figure per spike time tiling coefficient (STTC) lag selected when MEA-NAP was run. The STTC lag (in milliseconds) is indicated in the figure filename.  
 
 **Figure 1. Significance Table by Spike Time Tiling Coefficient (STTC) Lag.** Bubble plot show p-values (size of circle) for a linear mixed effect model (LME) with the group as the main effect and a random effect of the specific culture identity on the intercept (row 1) and a LME with the age as the main effect and a random effect of the specific culture identity on the intercept (row 2) for the network-level metrics (x-axis).  The rows below show the p-values for one (1)-way ANOVA tests and paired t-test with the group name and/or age in the row title.  The size of each circle is proportional to the p-value (see legend) with larger circles indicating smaller p-values.  For the LME and ANOVA tests, black indicates a p-value less than 0.05. However, it is up to the investigator to determine the relevant p-value for significance based on multiple comparisons.  For the paired t-tests, p-values less than 0.05 are colored based on the difference between the means with red indicating an increase in the mean and blue indicating a decrease in the mean (color bar, right bottom).
+
+
+**allclassifiersConfusionMatrix** This figure is generated if more than one time point (DIV) is provided in the dataset. It shows the confusion matrix for each classifier. The confusion matrix shows the number of samples that the classifier placed into each DIV group against the actual number of samples in each group.
+
+**allclassifiersMisclassificatoinRatePerKFold** This figure is generated if more than one time point (DIV) is provided in the dataset. It shows the misclassification rate of each classifier during k-fold cross validation (k is set to 5 by default), lower values indicate better classification performance. The gray horizontal line depicts the misclassification rate at chance level.
+
+ 
+
+

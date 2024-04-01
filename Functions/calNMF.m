@@ -124,6 +124,7 @@ varExplainedThreshold = 0.95;
 thresholdReached = 0;
 
 for k = 1:networkSize
+    
     [k_nmfFactors, k_nmfWeights, k_residual] = nnmf(downSampleSpikeMatrixActive,k, ... 
     'options', statset('UseParallel', hasParallelToolbox));
     
@@ -144,6 +145,16 @@ for k = 1:networkSize
     % D = norm(downSampleSpikeMatrixActive - nmfFactors*nmfWeights,'fro') / sqrt(numTimeBins*networkSize);
     % D_store(k) = D;
 end
+
+% This deals with edge case where variance explained never reached
+% threshold
+if (thresholdReached == 0) && (networkSize > 0)
+    nmfFactorsVarThreshold = k_nmfFactors;
+    nmfWeightsVarThreshold = k_nmfWeights;
+elseif networkSize == 0 
+    nmfFactorsVarThreshold = nan;
+    nmfWeightsVarThreshold = nan;
+end 
 
 
 %% Make output 

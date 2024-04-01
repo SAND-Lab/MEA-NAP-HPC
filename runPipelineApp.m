@@ -1,7 +1,12 @@
 %% Script to run pipeline app and propagate settings back to Params
 clear app
-app = AnalysisPipelineApp;
+app = MEANAPApp;
 app.MEANAPStatusTextArea.Value = {'Welcome! The MEA-NAP GUI is launched.'};
+
+% Default home directory 
+app.MEANAPFolderEditField.Value = pwd;
+
+% Default colours 
 app.colorUITable.Data = [ ...
    1, 0.996, 0.670, 0.318; ...
    2, 0.780, 0.114, 0.114; ... 
@@ -25,6 +30,36 @@ artifactRemovalTabParent = app.ArtifactRemovalTab.Parent;
 multipleTemplatesTabParent = app.MultipleTemplatesTab.Parent;
 advancedConnectivityTabParent = app.AdvancedConnectivityTab.Parent;
 nodeCartographyTabParent = app.NodeCartographyTab.Parent;
+
+% Set default network parameters to calculate
+
+app.NetworkmetricstocalculateListBox.Items = {'aN','Dens','CC','nMod','Q','PL','Eglob', ...
+    'SW','SWw', 'effRank', ...
+    'num_nnmf_components', 'nComponentsRelNS', ...
+    'NDmean', 'NDtop25', ...
+    'sigEdgesMean', 'sigEdgesTop10', ...
+    'NSmean', 'ElocMean', ... 
+    'PCmean', 'PCmeanTop10', 'PCmeanBottom10', ...
+    'percentZscoreGreaterThanZero', 'percentZscoreLessThanZero', ...
+    'NCpn1','NCpn2','NCpn3','NCpn4','NCpn5','NCpn6', ...
+    'aveControlMean', 'modalControlMean', ...
+    'ND','MEW','NS','Z','Eloc','PC','BC', ...
+    'aveControl', 'modalControl'};
+
+app.NetworkmetricstocalculateListBox.Value = {'aN','Dens','CC','nMod','Q','PL','Eglob', ...
+    'SW','SWw', 'effRank', ...
+    'num_nnmf_components', 'nComponentsRelNS', ...
+    'NDmean', 'NDtop25', ...
+    'sigEdgesMean', 'sigEdgesTop10', ...
+    'NSmean', 'ElocMean', ... 
+    'PCmean', 'PCmeanTop10', 'PCmeanBottom10', ...
+    'percentZscoreGreaterThanZero', 'percentZscoreLessThanZero', ...
+    'NCpn1','NCpn2','NCpn3','NCpn4','NCpn5','NCpn6', ...
+    'ND','MEW','NS','Z','Eloc','PC','BC', ...
+    'aveControl', 'modalControl'};
+
+
+%% Run pipeline app
 
 while app.RunPipelineButton.Value == 0
 
@@ -91,7 +126,7 @@ while app.RunPipelineButton.Value == 0
 
     % check if all required parameters are set
     homeDirSet = 1 - isempty(app.MEANAPFolderEditField.Value);
-    spreadsheetSet = 1 - isempty(app.SpreadsheetfilenameEditField.Value);
+    spreadsheetSet = 1 - isempty(app.SpreadsheetFilenameEditField.Value);
     
     if homeDirSet && spreadsheetSet
         app.AllrequiredparameterssetLamp.Color = [0 1 0];
@@ -118,13 +153,16 @@ while app.RunPipelineButton.Value == 0
         app.RawDataFolderEditField.Value = uigetdir;
         app.RawDataSelectButton.Value = 0;
         figure(app.UIFigure)  % put app back to focus
+        
+        % Update spreadsheet tab as well 
+        app.RawDataFolderEditField_2.Value = app.RawDataFolderEditField.Value;
     end 
     
     % Load CSV
     if app.SpreadsheetSelectButton.Value == 1
          [spreadsheetFilename, spreadsheetFolder] = uigetfile('.csv');
          spreadsheetFilePath = fullfile(spreadsheetFolder, spreadsheetFilename);
-         app.SpreadsheetfilenameEditField.Value = spreadsheetFilePath;
+         app.SpreadsheetFilenameEditField.Value = spreadsheetFilePath;
          app.SpreadsheetSelectButton.Value = 0;        
          figure(app.UIFigure)  % put app back to focus
          
@@ -135,7 +173,16 @@ while app.RunPipelineButton.Value == 0
          app.MEANAPStatusTextArea.Value = [app.MEANAPStatusTextArea.Value; sprintf('Your data has %.f rows', size(csv_data, 1))];
          app.MEANAPStatusTextArea.Value = [app.MEANAPStatusTextArea.Value; 'And columns with names:'];
          app.MEANAPStatusTextArea.Value = [app.MEANAPStatusTextArea.Value; strjoin(csv_data.Properties.VariableNames, ', ')];
+         
+         % Update spreadsheet tab csvTable with loaded csv data
+         app.SpreadsheetFilepathEditField.Value = spreadsheetFilePath;
+         app.csvTable.Data = csv_data;
+         app.csvTable.ColumnName = csv_data.Properties.VariableNames;
+         % app.csvTable.ColumnEditable = true; % logical(ones(1, length(csv_data.Properties.VariableNames)));
     end
+    
+    % Spreadsheet Tab 
+    
     
     % Load previous analysis folder 
     if app.PrevAnalysisSelectButton.Value == 1
@@ -177,7 +224,64 @@ while app.RunPipelineButton.Value == 0
         app.SaveParametersButton.Value = 0;
         figure(app.UIFigure)  % put app back to focus
     end 
-
+    
+    % FILE CONVERSION 
+    
+    % Path to files to convert 
+    if app.FileConversionselectButton.Value == 1 
+        app.DataFolderEditField.Value = uigetdir;
+        app.FileConversionselectButton.Value = 0;
+        figure(app.UIFigure)  % put app back to focus
+    end 
+    
+    if ~strcmp(app.FileTypeDropDown.Value, '.raw from Axion Maestro')
+        app.BatchCSVNameEditField.Enable = 0;
+        app.DIVincludedCheckBox.Enable = 0;
+        app.OneGenotypeCheckBox.Enable = 0;
+        app.GroupNameEditField.Enable = 0;
+    else 
+        app.BatchCSVNameEditField.Enable = 1;
+        app.DIVincludedCheckBox.Enable = 1;
+        app.OneGenotypeCheckBox.Enable = 1;
+        app.GroupNameEditField.Enable = 1;
+    end 
+    
+    if app.RunfileconversionButton.Value == 1
+        
+        % add functions to file path 
+        addpath(genpath(fullfile(app.MEANAPFolderEditField.Value, 'Functions')))
+        
+        app.MEANAPStatusTextArea.Value = ...
+            [app.MEANAPStatusTextArea.Value; 'Running file conversion...'];
+        if strcmp(app.FileTypeDropDown.Value, '.raw from Multichannel Systems')  
+            app.MEANAPStatusTextArea.Value = ...
+            [app.MEANAPStatusTextArea.Value; 'on .raw files from Multichannel Systems...'];
+            MEAbatchConvert('.raw', app.DataFolderEditField.Value);
+            cd(app.MEANAPFolderEditField.Value); 
+        elseif strcmp(app.FileTypeDropDown.Value, '.raw from Axion Maestro')
+             app.MEANAPStatusTextArea.Value = ...
+            [app.MEANAPStatusTextArea.Value; 'on .raw files from Axion Maestro...'];
+            drawnow;
+            rawConvertFunc(app.MEANAPFolderEditField.Value, app.DataFolderEditField.Value, ...
+                app.BatchCSVNameEditField.Value, app.DIVincludedCheckBox.Value, ...
+                app.OneGenotypeCheckBox.Value, app.GroupNameEditField.Value)
+            
+        elseif strcmp(app.FileTypeDropDown.Value, '.h5 from Multichannel Systems')
+            app.MEANAPStatusTextArea.Value = ...
+            [app.MEANAPStatusTextArea.Value; 'on .h5 files from Multichannel Systems...'];
+            drawnow;
+            convertMCSh5toMat(app.DataFolderEditField.Value);
+        end 
+        app.MEANAPStatusTextArea.Value = ...
+            [app.MEANAPStatusTextArea.Value; 'File conversion complete!'];
+        app.RunfileconversionButton.Value = 0;
+    end 
+    
+    % ND is a compulsory network metric to calculate (used in many plots)
+    if 1 - any(strcmp(app.NetworkmetricstocalculateListBox.Value, 'ND'))
+        app.NetworkmetricstocalculateListBox.Value{end+1} = 'ND';
+    end 
+    
     pause(0.1)
 end 
 
@@ -191,6 +295,7 @@ Params.priorAnalysisPath = app.PreviousAnalysisFolderEditField.Value;
 Params.spikeDetectedData = app.SpikeDataFolderEditField.Value;
 
 Params.guiMode = 1;
+Params.customGrpOrder = {};  % TODO: Put this in the GUI
 
 % some workspace varaibles 
 HomeDir = Params.HomeDir;  % TODO: just put this to Params
@@ -198,8 +303,21 @@ spreadsheet_filename = Params.spreadSheetFileName;
 rawData = Params.rawData;
 detectSpikes = Params.detectSpikes;
 Params.output_spreadsheet_file_type = 'csv';
+csvRange = str2num(app.SpreadsheetRangeEditField.Value);
+option = 'list';  % spike detection option
+Params.spikeMethodColors = ...
+    [  0    0.4470    0.7410; ...
+    0.8500    0.3250    0.0980; ...
+    0.9290    0.6940    0.1250; ...
+    0.4940    0.1840    0.5560; ... 
+    0.4660    0.6740    0.1880; ... 
+    0.3010    0.7450    0.9330; ... 
+    0.6350    0.0780    0.1840];
 
-%% Some stuff that were dealt with previously in biAdvancedSettings 
+% Raster colormap 
+Params.rasterColormap = 'parula';  % 'parula' or 'gray'
+
+%% Some stuff that were dealt with previously in AdvancedSettings 
 if any(isnan(Params.outputDataFolder)) || isempty(Params.outputDataFolder)
     Params.outputDataFolder = HomeDir;
 end 

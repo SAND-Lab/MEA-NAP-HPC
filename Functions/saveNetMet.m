@@ -41,7 +41,7 @@ NetMetricsC = Params.unitLevelNetMetToPlot;
 % and put them on separate tables 
 
 experimentMatFolderPath = fullfile(Params.outputDataFolder, ...
-        strcat('OutputData',Params.Date, Params.NewFNSuffix), 'ExperimentMatFiles');
+        strcat('OutputData',Params.Date,Params.NewFNSuffix), 'ExperimentMatFiles');
 
 allRecordingLevelData = struct();
 allElectrodeLevelData = struct();
@@ -87,25 +87,6 @@ for i = 1:length(ExpName)
          for lag = Params.FuncConLagval
             lagField = strcat('adjM', num2str(lag), 'mslag');
             
-            if e == 1
-                numElectrodes = expData.NetMet.(lagField).aN;
-                allElectrodeLevelData.FileName = [allElectrodeLevelData.FileName; repmat({expData.Info.FN{1}}, numElectrodes, 1)];
-                allElectrodeLevelData.Grp = [allElectrodeLevelData.Grp; repmat({expData.Info.Grp{1}}, numElectrodes, 1)];
-                allElectrodeLevelData.DIV = [allElectrodeLevelData.DIV; repmat(expData.Info.DIV{1}, numElectrodes, 1)];
-                % NOTE: This is currently a temp fix, the electrode
-                % identity is not correct here and will need to be included
-                % in future implementations including the electrode numbers
-                % in expData (Tim Sit 2023-01-07)
-                if size(expData.Info.channels(1:numElectrodes), 1) == 1
-                    allElectrodeLevelData.Channel = [allElectrodeLevelData.Channel; expData.Info.channels(1:numElectrodes)'];
-                else
-                    allElectrodeLevelData.Channel = [allElectrodeLevelData.Channel; expData.Info.channels(1:numElectrodes)];
-                end
-                
-                allElectrodeLevelData.Lag = [allElectrodeLevelData.Lag; repmat(lag, numElectrodes, 1)]; 
-     
-            end 
-            
             if contains(eMet, lagIndependentMets)
                 % 'effRank', 'num_nnmf_components', 'nComponentsRelNS'
                 firstLagField = sprintf('adjM%.fmslag', Params.FuncConLagval(1));
@@ -128,7 +109,26 @@ for i = 1:length(ExpName)
          for lag = Params.FuncConLagval
             
             lagField = strcat('adjM', num2str(lag), 'mslag');
-            numElectrodes = expData.NetMet.(lagField).aN;
+            
+            if e == 1
+                % numElectrodes = expData.NetMet.(lagField).aN;
+                numElectrodes = length(expData.NetMet.(lagField).activeNodeIndices);
+                nodeIndices = expData.NetMet.(lagField).activeNodeIndices;
+                allElectrodeLevelData.FileName = [allElectrodeLevelData.FileName; repmat({expData.Info.FN{1}}, numElectrodes, 1)];
+                allElectrodeLevelData.Grp = [allElectrodeLevelData.Grp; repmat({expData.Info.Grp{1}}, numElectrodes, 1)];
+                allElectrodeLevelData.DIV = [allElectrodeLevelData.DIV; repmat(expData.Info.DIV{1}, numElectrodes, 1)];
+                if size(expData.Info.channels(1:numElectrodes), 1) == 1
+                    allElectrodeLevelData.Channel = [allElectrodeLevelData.Channel; expData.Info.channels(nodeIndices)'];
+                else
+                    allElectrodeLevelData.Channel = [allElectrodeLevelData.Channel; expData.Info.channels(nodeIndices)];
+                end
+                
+                allElectrodeLevelData.Lag = [allElectrodeLevelData.Lag; repmat(lag, numElectrodes, 1)]; 
+     
+            end 
+            
+            numElectrodes = length(expData.NetMet.(lagField).activeNodeIndices);
+            % numElectrodes = expData.NetMet.(lagField).aN;
             
             if sum(isnan(expData.('NetMet').(lagField).(eMet))) == length(expData.('NetMet').(lagField).(eMet))
                 allElectrodeLevelData.(eMet) = [allElectrodeLevelData.(eMet); ...
@@ -146,7 +146,7 @@ for i = 1:length(ExpName)
 end
 
 outputDataDateFolder = fullfile(Params.outputDataFolder, ...
-        strcat('OutputData',Params.Date, Params.NewFNsuffix));
+        strcat('OutputData',Params.Date,Params.NewFNSuffix));
     
 
 % save recording level data 

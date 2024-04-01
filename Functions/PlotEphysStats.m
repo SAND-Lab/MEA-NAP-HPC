@@ -44,6 +44,7 @@ end
 %% Custom bounds for y axis 
 
 eMetCustomBounds = { ...
+'number of active electrodes', [0, nan]; ...
 'mean firing rate (Hz)', [0, nan]; ...
 'median firing rate (Hz)', [0, nan]; ...
 'network burst rate (per minute)', [0, nan]; ... 
@@ -51,7 +52,7 @@ eMetCustomBounds = { ...
 'mean ISI within network burst (ms)', [0, nan]; ...
 'mean ISI outside network bursts (ms)', [0, nan]; ...
 'coefficient of variation of inter network burst intervals', [0, nan]; ...
-'fraction of in network bursts', [0, 1]; ... 
+'fraction of bursts in network bursts', [0, 1]; ... 
 'mean number of channels involved in network bursts', [0, nan]; ... 
 };
 
@@ -188,57 +189,9 @@ for i = 1:length(ExpName)
 end
 
 
-%% export to excel / csv
-% TODO: export to csv as well
-
-outputDataDateFolder = fullfile(Params.outputDataFolder, ...
-        strcat('OutputData',Params.Date,Params.NewFNSuffix));
-
-% network means
-for g = 1:length(Grps)
-    eGrp = cell2mat(Grps(g));
-    for d = 1:length(AgeDiv)
-        eDiv = strcat('TP',num2str(d));
-        VNe = strcat(eGrp,'.',eDiv);
-        VNet = strcat('TempStr.',eDiv);
-        for e = 1:length(NetMetricsE)
-            eval([VNet '.' char(NetMetricsE(e)) '=' VNe '.' char(NetMetricsE(e)) ';']);
-        end
-        eval(['DatTemp = ' VNet ';']);
-        spreadsheetFname = strcat('NeuronalActivity_RecordingLevel_',eGrp,'.xlsx');
-        spreadsheetFpath = fullfile(outputDataDateFolder, spreadsheetFname);
-        writetable(struct2table(DatTemp), spreadsheetFpath, ...
-            'FileType','spreadsheet','Sheet',strcat('Age',num2str(AgeDiv(d))));
-    end
-end
-
-clear DatTemp TempStr
-
-% electrode specific
-for g = 1:length(Grps)
-    eGrp = cell2mat(Grps(g));
-    for d = 1:length(AgeDiv)
-        eDiv = strcat('TP',num2str(d));
-        VNe = strcat(eGrp,'.',eDiv);
-        VNet = strcat('TempStr.',eDiv);
-        for e = 1:length(NetMetricsC)
-            eval([VNet '.' char(NetMetricsC(e)) '=' VNe '.' char(NetMetricsC(e)) ';']);
-        end
-        eval(['DatTemp = ' VNet ';']);
-
-        spreadsheetFname = strcat('NeuronalActivity_NodeLevel_',eGrp,'.xlsx');
-        spreadsheetFpath = fullfile(outputDataDateFolder, spreadsheetFname);
-        writetable(struct2table(DatTemp), spreadsheetFpath, ... 
-            'FileType','spreadsheet','Sheet',strcat('Age',num2str(AgeDiv(d))));
-    end
-end
-
-clear DatTemp TempStr
-
-
 %% notBoxPlots - plots by group
 
-notBoxPlotByGroupFolder = fullfile(Params.outputDataFolder, strcat('OutputData', Params.Date, Params.NewFNSuffix), ...
+notBoxPlotByGroupFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date,Params.NewFNSuffix), ...
     '2_NeuronalActivity', '2B_GroupComparisons', '3_RecordingsByGroup', 'NotBoxPlots');
 
 eMet = NetMetricsE; 
@@ -246,7 +199,7 @@ eMetl = {'number of active electrodes','mean firing rate (Hz)','median firing ra
     'network burst rate (per minute)','mean number of channels involved in network bursts', ...
     'mean network burst length (s)','mean ISI within network burst (ms)', ... 
     'mean ISI outside network bursts (ms)','coefficient of variation of inter network burst intervals', ... 
-    'fraction of in network bursts'}; 
+    'fraction of bursts in network bursts'}; 
 
 p = [100 100 1300 600]; 
 set(0, 'DefaultFigurePosition', p)
@@ -324,7 +277,7 @@ eMetl = {'number of active electrodes','mean firing rate (Hz)','median firing ra
     'network burst rate (per minute)','mean number of channels involved in network bursts', ...
     'mean network burst length (s)','mean ISI within network burst (ms)', ... 
     'mean ISI outside network bursts (ms)','coefficient of variation of inter network burst intervals', ...
-    'fraction of in network bursts'}; 
+    'fraction of bursts in network bursts'}; 
 
 p = [100 100 1300 600]; 
 set(0, 'DefaultFigurePosition', p)
@@ -427,7 +380,7 @@ end
 
 %% notBoxPlots - plots by DIV
 
-notBoxPlotByDivFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date,Params.NewFNSuffix), ...
+notBoxPlotByDivFolder = fullfile(Params.outputDataFolder, strcat('OutputData',Params.Date, Params.NewFNSuffix), ...
     '2_NeuronalActivity', '2B_GroupComparisons', '4_RecordingsByAge', 'NotBoxPlots');
 
 eMet = NetMetricsE; 
@@ -435,7 +388,7 @@ eMetl = {'number of active electrodes','mean firing rate (Hz)','median firing ra
     'network burst rate (per minute)','mean number of channels involved in network bursts', ... 
     'mean network burst length (s)','mean ISI within network burst (ms)', ... 
     'mean ISI outside network bursts (ms)','coefficient of variation of inter network burst intervals', ... 
-    'fraction of in network bursts'}; 
+    'fraction of bursts in network bursts'}; 
 
 p = [100 100 1300 600]; 
 set(0, 'DefaultFigurePosition', p)
@@ -550,7 +503,7 @@ eMetl = {'number of active electrodes','mean firing rate (Hz)','median firing ra
     'network burst rate (per minute)','mean number of channels involved in network bursts', ... 
     'mean network burst length (s)','mean ISI within network burst (ms)', ... 
     'mean ISI outside network bursts (ms)','coefficient of variation of inter network burst intervals', ...
-    'fraction of in network bursts'}; 
+    'fraction of bursts in network bursts'}; 
 
 p = [100 100 1300 600]; 
 set(0, 'DefaultFigurePosition', p)

@@ -2,11 +2,11 @@
 <html class="no-js" lang="en" data-content_root="./">
   <head><meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark"><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Running MEA-NAP on High-Performance Computing (HPC)" href="running-MEANAP-on-HPC.html" /><link rel="prev" title="Guide for New Users" href="guide-for-new-users.html" />
 
-    <!-- Generated with Sphinx 7.2.6 and Furo 2023.09.10 -->
-        <title>Guide for Advanced Users - MEA pipeline 1.5.1 documentation</title>
+    <!-- Generated with Sphinx 7.2.6 and Furo 2024.01.29 -->
+        <title>Guide for Advanced Users - MEA pipeline 1.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=362ab14a" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=135e06be" />
     <link rel="stylesheet" type="text/css" href="_static/css/tooltipster.custom.css" />
@@ -131,7 +131,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">MEA pipeline 1.5.1 documentation</div></a>
+      <a href="index.html"><div class="brand">MEA pipeline 1.6.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -154,7 +154,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">MEA pipeline 1.5.1 documentation</span>
+  <span class="sidebar-brand-text">MEA pipeline 1.6.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -175,6 +175,7 @@
 <li class="toctree-l1"><a class="reference internal" href="frequently-asked-questions.html">Frequently Asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="how-to-contribute.html">Contributing to the Project</a></li>
 <li class="toctree-l1"><a class="reference internal" href="sources.html">Code Sources</a></li>
+<li class="toctree-l1"><a class="reference internal" href="citing-MEANAP.html">Citing MEA-NAP</a></li>
 </ul>
 
 </div>
@@ -211,9 +212,10 @@
         <article role="main">
           <section id="guide-for-advanced-users">
 <h1>Guide for Advanced Users<a class="headerlink" href="#guide-for-advanced-users" title="Link to this heading">#</a></h1>
-<p>If you have <strong>a solid background in MATLAB</strong>, running the <cite>MEApipeline.m</cite> script involves fine-tuning parameters crucial for batch analysis of experimental files.
-By customizing parameters in <cite>MEApipeline.m</cite>, users can tailor their data analysis to align with the specific requirements of your experiments.
-Without the interactive GUI Mode (found under ‘Guide for New Users’), you will be working with directly <cite>MEApipeline.m</cite>.</p>
+<p>If you have <strong>a solid background in MATLAB</strong>, you can turn off the GUI mode (line 76, change 1 to 0) and instead manually enter the required information prior to running the <cite>MEApipeline.m</cite> script for batch analysis of your experimental data.
+By customizing parameters in <cite>MEApipeline.m</cite>, users can tailor their data analysis to align with the specific requirements of your experiments.</p>
+<p>Advanced users may also find leaving the GUI mode on to be convenient, particularly for running MEA-NAP again on the same data with different parameters.  The Save and Load Parameters buttons on the GUI are particularly useful.  Advanced users can also conveniently edit additional parameters by checking “Show Advanced Settings” on the General settings tab in the GUI.  This will create additional tabs at the end of the GUI (use right arrow to navigate).   This “Guide for Advanced Users” provides explanations of some of the parameters.  However, advanced users may also need to examine the individual functions in MATLAB.</p>
+<hr class="docutils" />
 <section id="overview-of-mea-nap">
 <span id="overview"></span><h2>Overview of MEA-NAP<a class="headerlink" href="#overview-of-mea-nap" title="Link to this heading">#</a></h2>
 <p>The pipeline has the following steps:</p>
@@ -221,27 +223,27 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <li><p>Spike detection (this step can be skipped if done previously)</p></li>
 <li><p>Comparison of the neuronal activity (e.g., firing rates, burst rates)</p></li>
 <li><p>Inferring the functional connectivity</p></li>
-<li><p>Comparison of the network activity (i.e., graph theoretical metric)</p></li>
+<li><p>Comparison of the network activity (e.g., graph theoretical metrics)</p></li>
 <li><p>Statistical analysis (e.g., feature correlation and classification)</p></li>
 </ol>
 </section>
 <section id="starting-mea-nap">
 <h2>Starting MEA-NAP<a class="headerlink" href="#starting-mea-nap" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>Make sure all of the recordings are in <cite>*.mat</cite> format and saved in the same folder first.</p></li>
-<li><p>To use the pipeline, open <code class="docutils literal notranslate"><span class="pre">MEApipeline.m</span></code> in MATLAB next.</p></li>
+<li><p>Make sure all of the recordings are in the correct <cite>*.mat</cite> format and saved in the same folder first.</p></li>
+<li><p>To use the pipeline, open <code class="docutils literal notranslate"><span class="pre">MEApipeline.m</span></code> in MATLAB.</p></li>
 </ul>
 <section id="required-user-input-in-the-first-section-of-mea-nap">
 <h3>Required user input in the first section of MEA-NAP<a class="headerlink" href="#required-user-input-in-the-first-section-of-mea-nap" title="Link to this heading">#</a></h3>
 <ul class="simple">
-<li><p>The first section of <code class="docutils literal notranslate"><span class="pre">MEApipeline.m</span></code> sets many of the parameters that instruct the pipeline on how to do the following:</p>
+<li><p>The first section of <code class="docutils literal notranslate"><span class="pre">MEApipeline.m</span></code> sets many of the parameters that instruct MEA-NAP on how to do the following:</p>
 <ul>
 <li><p>Find your data</p></li>
 <li><p>Select which parts of the analysis pipeline to run</p></li>
 <li><p>Save your outputs</p></li>
 </ul>
 </li>
-<li><p>Follow the prompts to set-up the pipeline for analysing a single or multiple MEA recording files in the same experiment.</p></li>
+<li><p>Follow the prompts to set-up MEA-NAP for analysing a single or multiple MEA recording files in the same experiment.</p></li>
 </ul>
 <p>This section is also well annotated and does not require understanding of MATLAB in order to edit.  Save your edits and run.</p>
 <ul class="simple">
@@ -251,9 +253,9 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 16.7%" />
-<col style="width: 27.8%" />
-<col style="width: 55.6%" />
+<col style="width: 17%" />
+<col style="width: 28%" />
+<col style="width: 56%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Line</p></th>
@@ -300,7 +302,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 </tr>
 <tr class="row-odd"><td><p>40</p></td>
 <td><p>Params.dSampF</p></td>
-<td><p>Confirm the downsampling factor is correct for spike detection check in step 1 of the pipeline. Its value should match the sampling frequency.</p></td>
+<td><p>Down-sampling factor for plotting spike detection checks in Step 1B. For most analyses, no down sampling is necessary. Thus, set this to be equal to <code class="docutils literal notranslate"><span class="pre">Params.fs</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>42</p></td>
 <td><p>Params.channelLayout</p></td>
@@ -320,9 +322,9 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 16.7%" />
-<col style="width: 27.8%" />
-<col style="width: 55.6%" />
+<col style="width: 17%" />
+<col style="width: 28%" />
+<col style="width: 56%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Line</p></th>
@@ -337,24 +339,24 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 </tr>
 <tr class="row-odd"><td><p>30</p></td>
 <td><p>Params.startAnalysisStep</p></td>
-<td><p>If you would like to start running the pipeline at a later step than spike detection (step 1) using the prior data, change to the corresponding number. See Section 3.1 for an overview of pipeline functions. If <code class="docutils literal notranslate"><span class="pre">Params.priorAnalysis=0</span></code>, the default is to start with spike detection. N.B. Steps 2-4 all require spike detection to run. Step 4 requires Step 3. Step 5 requires step 4.</p></td>
+<td><p>If you would like to start running the pipeline at a later step than spike detection (step 1) using the prior data, change to the corresponding number. See Section 3.1 for an overview of pipeline functions. If <code class="docutils literal notranslate"><span class="pre">Params.priorAnalysis=0</span></code>, the default is to start with spike detection. N.B. Steps 2-5 all require spike detection to run. Step 4 requires Step 3. Step 5 requires step 4. If you want to start with Step 1B (spike detection checks), enter 1 here, set detectSpikes (line 37) to 0, and Params.runSpikeCheckOnPrevSpikeData (line 38)</p></td>
 </tr>
 <tr class="row-even"><td><p>31</p></td>
 <td><p>Params.optionalStepsToRun</p></td>
-<td><p>If you have completed steps 1 -4 of the pipeline, use this step to run optional downstream steps of the pipeline. You can set this setting equal to ‘runStats’ to perform statistical analysis that looks at feature correlations and classification across groups. You can also set it equal to ‘combineDIVplots’ to combine plots across DIVs.</p></td>
+<td><p>If you have completed steps 1-4 of the pipeline, use this step to run optional downstream steps of the pipeline. You can set this setting equal to ‘runStats’ (Step 5) to perform statistical analysis that looks at feature correlations and classification across groups. You can also set it equal to ‘combineDIVplots’ to combine plots across DIVs, if the filenames for recordings from the same culture have the same filename except for the number (age) after DIV in the filenames (e.g, NGN2230408_P1A1_DIV14, NGN2230408_P1A1_DIV21, NGN2230408_P1A1_DIV28).</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </section>
-<section id="spike-detection-settings-lines-13-95">
-<h3>Spike detection settings (lines 13 - 95)<a class="headerlink" href="#spike-detection-settings-lines-13-95" title="Link to this heading">#</a></h3>
+<section id="spike-detection-parameters">
+<h3>Spike detection parameters<a class="headerlink" href="#spike-detection-parameters" title="Link to this heading">#</a></h3>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 16.7%" />
-<col style="width: 27.8%" />
-<col style="width: 55.6%" />
+<col style="width: 17%" />
+<col style="width: 28%" />
+<col style="width: 56%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Line</p></th>
@@ -381,20 +383,32 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 </tr>
 <tr class="row-even"><td><p>43</p></td>
 <td><p>Params.thresholds</p></td>
-<td><p>Choose one or more standard deviations (SD) if running threshold-based spike detection. This method identifies negative voltage deflections that exceed the threshold set based on the SD of the mean voltage signal. This method is fast. It works well for electrodes with a high signal-to-noise ratio and for recordings with similar firing rates. Threshold-based methods can underestimate spikes in electrodes with high firing rates and are susceptible to</p></td>
+<td><p>Choose one or more mean absolute deviations (MAD) if running threshold-based spike detection. This method identifies negative voltage deflections that exceed the threshold set based on the MAD of the voltage signal. This method is fast. It works well for electrodes with a high signal-to-noise ratio and for recordings with similar firing rates. Threshold-based methods can underestimate spikes in electrodes with high firing rates and are susceptible to counting artifacts as spikes.</p></td>
+</tr>
+<tr class="row-odd"><td><p>44</p></td>
+<td><p>Params.wnameList</p></td>
+<td><p>Choose one or more wavelets for template-based spike detection.  We routinely use MATLAB built-in wavelets bior1.5, bior1.3, and db2 (db2 is least spike-like). For custom electrode-specific templates created from 50 spikes detected by the threshold method, use mea.  This may require further tuning by advanced users to calibrate for your data.  The published SWTTEO method is also available (swetteo), but we have not tested it extensively with our data.</p></td>
+</tr>
+<tr class="row-even"><td><p>45</p></td>
+<td><p>Params.costList</p></td>
+<td><p>Cost parameter for wavelets in templated-based spike detection.  Determines balance of false positives to false negatives.  Can tune for your dataset.  We have found that -0.12 to -0.2 works well for most of our MEA data (when comparing spike detection pre- and post-TTX).</p></td>
+</tr>
+<tr class="row-odd"><td><p>46</p></td>
+<td><p>Params.SpikesMethod</p></td>
+<td><p>Choose spike detection method to use for steps 2-4 of the pipeline (e.g., ‘bior1p5’, ‘thr4’, ‘mergedAll’, or ‘mergedWavelet’).  mergedAll combines all spike detection methods and parameters selected above.  mergedWavelets combines only the spikes detected by one or more of the wavelets selected above.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </section>
-<section id="functional-connectivity-settings">
-<h3>Functional connectivity settings<a class="headerlink" href="#functional-connectivity-settings" title="Link to this heading">#</a></h3>
+<section id="functional-connectivity-parameters">
+<h3>Functional connectivity parameters<a class="headerlink" href="#functional-connectivity-parameters" title="Link to this heading">#</a></h3>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 16.7%" />
-<col style="width: 27.8%" />
-<col style="width: 55.6%" />
+<col style="width: 17%" />
+<col style="width: 28%" />
+<col style="width: 56%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Line</p></th>
@@ -405,7 +419,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <tbody>
 <tr class="row-even"><td><p>49</p></td>
 <td><p>Params.FuncConLagval</p></td>
-<td><p>The pipeline uses the spike time tiling coefficient (STTC; Cutts &amp; Eglen, 2014) to estimate pairwise correlations between spiking activity observed in electrodes. Select one or more lag values (in milliseconds) for detecting coincident activity.  For MCS-acquired data, 25 ms is a good starting point. Pipeline works best if you choose 2 or 3 different lags to compare (although the computational time is longer).</p></td>
+<td><p>The pipeline uses the spike time tiling coefficient (STTC; Cutts &amp; Eglen, 2014) to estimate pairwise correlations between spiking activity observed in electrodes. Select one or more lag values (in milliseconds) for detecting coincident activity.  For most neuronal cultures, 10 or 25 ms is a good starting point. Pipeline works best if you choose 2 or 3 different lags to compare (although the computational time is longer).</p></td>
 </tr>
 <tr class="row-odd"><td><p>50, 51</p></td>
 <td><p>Params.TrunRec, Params.TrunLength</p></td>
@@ -423,14 +437,14 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 </table>
 </div>
 </section>
-<section id="node-cartography-settings">
-<h3>Node cartography settings<a class="headerlink" href="#node-cartography-settings" title="Link to this heading">#</a></h3>
+<section id="node-cartography-parameters">
+<h3>Node cartography parameters<a class="headerlink" href="#node-cartography-parameters" title="Link to this heading">#</a></h3>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 16.7%" />
-<col style="width: 27.8%" />
-<col style="width: 55.6%" />
+<col style="width: 17%" />
+<col style="width: 28%" />
+<col style="width: 56%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Line</p></th>
@@ -441,28 +455,28 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <tbody>
 <tr class="row-even"><td><p>61</p></td>
 <td><p>Params.autoSetCartographyBoudariesPerLag</p></td>
-<td><p>During step 4, our pipeline generates figures related to node cartography. Use this setting to choose whether to fir separate boundaries per lag value.</p></td>
+<td><p>During step 4, our pipeline generates figures related to node cartography. Use this setting to choose whether there are separate boundaries per STTC lag value.</p></td>
 </tr>
 <tr class="row-odd"><td><p>62</p></td>
 <td><p>Params.cartographyLagVal</p></td>
-<td><p>If <code class="docutils literal notranslate"><span class="pre">Params.autoSetCartographyBoudariesPerLag</span> <span class="pre">=</span> <span class="pre">0</span></code>, specifiy lag values (in ms) that you want to use to calculate PC-Z distribution.</p></td>
+<td><p>If <code class="docutils literal notranslate"><span class="pre">Params.autoSetCartographyBoudariesPerLag</span> <span class="pre">=</span> <span class="pre">0</span></code>, specifiy lag values (in ms) that you want to use to calculate the hub boundaries (based on the PC-Z distribution).</p></td>
 </tr>
 <tr class="row-even"><td><p>63</p></td>
 <td><p>Params.autoSetCartographyBoundaries</p></td>
-<td><p>This setting specifies whether the pipeline should automatically determine the boundaries for hubs or use custom ones during the node</p></td>
+<td><p>This setting specifies whether the pipeline should automatically determine the boundaries for hubs or use custom ones for the node cartography.</p></td>
 </tr>
 </tbody>
 </table>
 </div>
 </section>
-<section id="statistics-and-machine-learning-settings">
-<h3>Statistics and machine learning settings<a class="headerlink" href="#statistics-and-machine-learning-settings" title="Link to this heading">#</a></h3>
+<section id="statistics-and-machine-learning-parameters">
+<h3>Statistics and machine learning parameters<a class="headerlink" href="#statistics-and-machine-learning-parameters" title="Link to this heading">#</a></h3>
 <div class="table-wrapper colwidths-given docutils container">
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 16.7%" />
-<col style="width: 27.8%" />
-<col style="width: 55.6%" />
+<col style="width: 17%" />
+<col style="width: 28%" />
+<col style="width: 56%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Line</p></th>
@@ -473,7 +487,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <tbody>
 <tr class="row-even"><td><p>66</p></td>
 <td><p>Params.classificationTarget</p></td>
-<td><p>Specify which property of your recordings that you wish to classify using machine learning based classification and regression models during step 5 (statisical analysis) of the pipeline.</p></td>
+<td><p>Specify which property of your recordings that you wish to classify using machine-learning-based classification and regression models during step 5 (statisical analysis) of the pipeline.</p></td>
 </tr>
 <tr class="row-odd"><td><p>67</p></td>
 <td><p>Params.classification_models</p></td>
@@ -489,15 +503,20 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 </section>
 <section id="pipeline-output-preferences">
 <h3>Pipeline output preferences<a class="headerlink" href="#pipeline-output-preferences" title="Link to this heading">#</a></h3>
-<div class="table-wrapper docutils container" id="id62">
-<table class="docutils align-default" id="id62">
-<caption><span class="caption-text">:widths: 15 25 50
- :header-rows: 1</span><a class="headerlink" href="#id62" title="Link to this table">#</a></caption>
-<tbody>
-<tr class="row-odd"><td><p>Line</p></td>
-<td><p>Variable</p></td>
-<td><p>User input required</p></td>
+<div class="table-wrapper colwidths-given docutils container">
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 28%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Line</p></th>
+<th class="head"><p>Variable</p></th>
+<th class="head"><p>User input required</p></th>
 </tr>
+</thead>
+<tbody>
 <tr class="row-even"><td><p>71</p></td>
 <td><p>Params.figExt</p></td>
 <td><p>The pipeline output includes a large number of figures which allow you to look at network features within individual networks and to compare across multiple recordings.  You can have these figures in .fig (can edit in MATLAB), .png (standard image), and/or .svg (can edit colors, font sizes in graphics programs). Specify which extensions to include as a cell array in this line.  More file types selected increases pipeline run time.</p></td>
@@ -519,8 +538,8 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <p>After completing this list, no further changes are necessary to run the pipeline. Save your changes.  Press RUN and then wait!  The length of time will depend on the acquisition rate, length of recordings, number of files and processing power of the computer. Cluster computing when available is recommended for larger batch datasets.</p>
 </section>
 </section>
-<section id="pipeline-settings">
-<h2>Pipeline settings<a class="headerlink" href="#pipeline-settings" title="Link to this heading">#</a></h2>
+<section id="pipeline-parameters">
+<h2>Pipeline parameters<a class="headerlink" href="#pipeline-parameters" title="Link to this heading">#</a></h2>
 <section id="id3">
 <h3>Overview<a class="headerlink" href="#id3" title="Link to this heading">#</a></h3>
 <p>Folder paths:</p>
@@ -648,7 +667,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id8"></span><h4><code class="docutils literal notranslate"><span class="pre">spreadsheet_filename</span></code><a class="headerlink" href="#spreadsheet-filename" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>the name of spreadsheet containing information about the data to be analysed, including the file extension, usually in the form of ‘spreadhsheet.csv’ or ‘spreadsheet.xlsx’</p></li>
+<li><p>The name of spreadsheet containing information about the data to be analysed, including the file extension, usually in the form of ‘spreadhsheet.csv’ or ‘spreadsheet.xlsx’</p></li>
 <li><p>this spreadsheet file is assumed to be located in the main analysis pipeline folder</p></li>
 <li><p>argument type: string or character array</p></li>
 </ul>
@@ -736,7 +755,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id16"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.detectSpikes</span></code><a class="headerlink" href="#params-detectspikes" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>determines whether to run spike detection in the pipeline</p></li>
+<li><p>Determines whether to run spike detection in the pipeline</p></li>
 <li><p>argument type: boolean</p></li>
 <li><p>options: 0 : do not detect spikes, 1 : detect spikes</p></li>
 </ul>
@@ -745,7 +764,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 “”””””””””””””””””””””””””””””””’</p>
 <blockquote>
 <div><ul class="simple">
-<li><p>the sampling rate of the recording electrodes, in samples per second (Hz)</p></li>
+<li><p>Sampling rate of the recording electrodes, in samples per second (Hz)</p></li>
 <li><p>argument type: int</p></li>
 <li><p>default : 25000</p></li>
 </ul>
@@ -755,7 +774,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id17"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.dSampF</span></code><a class="headerlink" href="#params-dsampf" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>the down sample frequency for spike detection check</p></li>
+<li><p>The down-sampling factor for plotting spike detection checks in Step 1B. For most analyses, no down sampling is necessary. Thus, set this to be equal to <code class="docutils literal notranslate"><span class="pre">Params.fs</span></code>.</p></li>
 <li><p>normally, this should be kept as the same value as <cite>Params.fs</cite></p></li>
 <li><p>argument type: int</p></li>
 <li><p>default: 25000</p></li>
@@ -767,7 +786,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <blockquote>
 <div><ul class="simple">
 <li><p>the unit of potential difference in which you are recording electrical signals</p></li>
-<li><p>options: ‘mV’ for millivolt, ‘uV’ for microvolt</p></li>
+<li><p>options: ‘V’ for volt, ‘mV’ for millivolt, ‘uV’ for microvolt</p></li>
 <li><p>default : ‘uV’</p></li>
 </ul>
 </div></blockquote>
@@ -776,7 +795,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id19"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.channelLayout</span></code><a class="headerlink" href="#params-channellayout" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>which channel layout to use for plotting firing rate heatmaps, and other plots related to the layout of the electrodes</p></li>
+<li><p>The channel layout to use for plotting firing rate heatmaps, and other plots related to the layout of the electrodes</p></li>
 <li><p>options: ‘MCS60’ = multichannel systems layout with 59 recording electrodes + 1 grounding electrode, ‘Axion64’ = axion recording layout in a 8 x 8 grid with 64 electrodes, ‘Custom’ = provide own custom layout by specifying the coordinate of each electrode in biAdvantedSettings.m, you will need to edit the block of code under strcmp(Params.channelLayout, ‘Custom’)</p></li>
 </ul>
 </div></blockquote>
@@ -785,7 +804,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id20"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.coords</span></code><a class="headerlink" href="#params-coords" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>the x and y coordinates of each electrode to be used for visualisation purposes</p></li>
+<li><p>The x and y coordinates of each electrode to be used for visualisation purposes</p></li>
 <li><p>this is automatically set of Params.channelLayout is one of the provided options ‘MCS60’ or ‘Axion64’, but will require to be set by the user if the option chosen the ‘Custom’ option</p></li>
 <li><p>argument type : nUnit x 2 matrix where nUnit is the number of recorded units, such that each row contains the x and y coordinate of the corresponding recorded unit</p></li>
 </ul>
@@ -795,7 +814,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id21"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.wnameList</span></code><a class="headerlink" href="#params-wnamelist" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>determines which wavelets to run the spike detection with</p></li>
+<li><p>Determines which wavelets to run the spike detection with</p></li>
 <li><p>argument type: either string or a cell array of strings</p></li>
 <li><p>options: bior1p5, bior1p3, db2, mea,</p></li>
 </ul>
@@ -805,7 +824,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id22"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.SpikesMethod</span></code><a class="headerlink" href="#params-spikesmethod" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>the spike method to used in downstream analysis</p></li>
+<li><p>The spike method to used in downstream analysis</p></li>
 <li><p>argument type : char</p></li>
 <li><p>options : ‘bior1p5’, ‘bior1p3’, ‘merged’, ‘thr3p0’, or other available wavelet names</p></li>
 </ul>
@@ -818,7 +837,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id23"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.costList</span></code><a class="headerlink" href="#params-costlist" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>the false positive / false negative tradeoff for wavelet spike detection</p></li>
+<li><p>The false positive / false negative tradeoff for wavelet spike detection</p></li>
 <li><p>argument type : float value between -2 to 2</p></li>
 <li><p>default value : -0.12</p></li>
 </ul>
@@ -829,7 +848,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id24"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.threshold_calculation_window</span></code><a class="headerlink" href="#params-threshold-calculation-window" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>which part of the recording to do spike detection</p></li>
+<li><p>Which part of the recording to do spike detection</p></li>
 <li><p>0 : start of recording, 0.5 : middle of recording, 1 : end of recording</p></li>
 <li><p>argument type : a matlab double with 2 elements</p></li>
 <li><p>This is an advanced setting, modify this in biAdvancedSettings.m</p></li>
@@ -840,7 +859,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id25"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.refPeriod</span></code><a class="headerlink" href="#params-refperiod" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>the refractory period of spikes in milliseconds</p></li>
+<li><p>The refractory period of spikes in milliseconds</p></li>
 <li><p>spikes that are smaller than this time period apart will be excluded</p></li>
 <li><p>argument type : float</p></li>
 <li><p>default value : 0.2</p></li>
@@ -852,7 +871,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id26"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.filterLowPass</span></code><a class="headerlink" href="#params-filterlowpass" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>the low pass frequency (Hz) to use on the raw signal before spike detection</p></li>
+<li><p>The low pass frequency (Hz) to use on the raw signal before spike detection</p></li>
 <li><p>argument type : float</p></li>
 <li><p>default value : 600</p></li>
 </ul>
@@ -862,7 +881,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id27"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.filterHighPass</span></code><a class="headerlink" href="#params-filterhighpass" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>the high pass frequency (Hz) to use on the raw signal before spike detection</p></li>
+<li><p>The high pass frequency (Hz) to use on the raw signal before spike detection</p></li>
 <li><p>argument type : float</p></li>
 <li><p>default value : 8000</p></li>
 </ul>
@@ -884,7 +903,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id29"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.remove_artifacts</span></code><a class="headerlink" href="#params-remove-artifacts" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>whether to run process to remove artifacts from recording</p></li>
+<li><p>Whether to run process to remove artifacts from recording</p></li>
 <li><p>argument type : bool</p></li>
 <li><p>options : 1 = yes, 0 = no</p></li>
 <li><p>default : 0</p></li>
@@ -928,7 +947,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id33"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.multiplier</span></code><a class="headerlink" href="#params-multiplier" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>the multiplier to use for extracting spikes for wavelet adaptation method (not for the spike detection itself)</p></li>
+<li><p>The multiplier to use for extracting spikes for wavelet adaptation method (not for the spike detection itself)</p></li>
 <li><p>this is an advanced setting, and can be found in biAdvancedSettings.m</p></li>
 <li><p>argument type: float</p></li>
 <li><p>default: 3</p></li>
@@ -1032,7 +1051,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id43"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.netMetToCal</span></code><a class="headerlink" href="#params-netmettocal" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>list of network metrics to calculate</p></li>
+<li><p>List of network metrics to calculate</p></li>
 <li><p>argument type : cell containing strings</p></li>
 <li><p>options : ND, MEW, NS, aN, etc.</p></li>
 </ul>
@@ -1042,7 +1061,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id44"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.minNumberOfNodesToCalNetMet</span></code><a class="headerlink" href="#params-minnumberofnodestocalnetmet" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>minimum number of nodes required to calculate network metrics</p></li>
+<li><p>Minimum number of nodes required to calculate network metrics</p></li>
 <li><p>argument type : int</p></li>
 <li><p>options : any integer value from 2 to the maximum number of nodes in your network</p></li>
 <li><p>default value : 25</p></li>
@@ -1053,7 +1072,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id45"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.networkLevelNetMetToPlot</span></code><a class="headerlink" href="#params-networklevelnetmettoplot" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>list of network metrics to plot, this should be the same or a subset as the list of network metrics to calculate, which is specified in Params.netMetToCal</p></li>
+<li><p>List of network metrics to plot, this should be the same or a subset as the list of network metrics to calculate, which is specified in Params.netMetToCal</p></li>
 <li><p>argument type: cell array of strings / characters</p></li>
 <li><p>eg. {‘aN’, ‘Dens’, ‘effRank’}</p></li>
 </ul>
@@ -1063,7 +1082,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id46"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.networkLevelNetMetLabels</span></code><a class="headerlink" href="#params-networklevelnetmetlabels" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>list of labels corresponding to the network level metrics to plot</p></li>
+<li><p>List of labels corresponding to the network level metrics to plot</p></li>
 <li><p>eg. ‘aN’ denotes network size and so the label given is ‘network size’</p></li>
 <li><p>argument type: cell array of strings / characters with the same length as <cite>Params.networkLevelNetMetToPlot</cite></p></li>
 </ul>
@@ -1073,7 +1092,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id47"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.includeNMFcomponents</span></code><a class="headerlink" href="#params-includenmfcomponents" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>whether to include the components as output when performing non-negative matrix factorisation on the spike rate matrix, which outputs a matrix of size (num_components, num_time_samples) and a matrix of size (num_components, num_units)</p></li>
+<li><p>Whether to include the components as output when performing non-negative matrix factorisation on the spike rate matrix, which outputs a matrix of size (num_components, num_time_samples) and a matrix of size (num_components, num_units)</p></li>
 <li><p>argument type : bool</p></li>
 <li><p>options : 0 = no, 1 = yes</p></li>
 <li><p>default : 0</p></li>
@@ -1084,7 +1103,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id48"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.NMFdownSampleFreq</span></code><a class="headerlink" href="#params-nmfdownsamplefreq" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>how mcuh to downsample the spike rate matrix before performing non-negative matrix factorisation</p></li>
+<li><p>How mcuh to downsample the spike rate matrix before performing non-negative matrix factorisation</p></li>
 <li><p>eg. 10 will mean downsampling from 25000 Hz to 2500 Hz</p></li>
 <li><p>argument type : int</p></li>
 <li><p>default : 10</p></li>
@@ -1095,7 +1114,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id49"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.effRankCalMethod</span></code><a class="headerlink" href="#params-effrankcalmethod" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>whether to use the covariance or correlation matrix for effective rank calculation</p></li>
+<li><p>Whether to use the covariance or correlation matrix for effective rank calculation</p></li>
 <li><p>options: ‘covariance’ or ‘correlation’</p></li>
 <li><p>default: ‘covariance’</p></li>
 <li><p>this is an advanced setting and is located in biAdvancedSettings.m</p></li>
@@ -1115,7 +1134,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id51"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.hubBoundaryWMdDeg</span></code><a class="headerlink" href="#params-hubboundarywmddeg" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>boundary that separtes hub and non-hubs</p></li>
+<li><p>Boundary that separtes hub and non-hubs</p></li>
 <li><p>default value: 0.25</p></li>
 <li><p>argument type: float</p></li>
 <li><p>this argument has no effect if Params.autoSetCartographyBoundaries = 1</p></li>
@@ -1126,7 +1145,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id52"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.periPartCoef</span></code><a class="headerlink" href="#params-peripartcoef" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>boundary (in terms of participation coefficient) that separates peripheral node and non-hub connector</p></li>
+<li><p>Boundary (in terms of participation coefficient) that separates peripheral node and non-hub connector</p></li>
 <li><p>default value: 0.525</p></li>
 <li><p>argument type : float</p></li>
 <li><p>this argument has no effect if Params.autoSetCartographyBoundaries = 1</p></li>
@@ -1137,7 +1156,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id53"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.proHubPartCoef</span></code><a class="headerlink" href="#params-prohubpartcoef" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>boundary (in terms of participation coefficient) that separates provincial hub and connector hub</p></li>
+<li><p>Boundary (in terms of participation coefficient) that separates provincial hub and connector hub</p></li>
 <li><p>default value: 0.45</p></li>
 <li><p>argument type: float</p></li>
 <li><p>this argument has no effect if Params.autoSetCartographyBoundaries = 1</p></li>
@@ -1148,7 +1167,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id54"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.nonHubConnectorPartCoef</span></code><a class="headerlink" href="#params-nonhubconnectorpartcoef" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>boundary (in terms of participation coefficient) that separates non-hub connector and non-hub kinless node</p></li>
+<li><p>Boundary (in terms of participation coefficient) that separates non-hub connector and non-hub kinless node</p></li>
 <li><p>default value: 0.8</p></li>
 <li><p>argument type: float</p></li>
 <li><p>this argument has no effect if Params.autoSetCartographyBoundaries = 1</p></li>
@@ -1159,7 +1178,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id55"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.connectorHubPartCoef</span></code><a class="headerlink" href="#params-connectorhubpartcoef" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>boundary that separates connector hub and kinless hub</p></li>
+<li><p>Boundary that separates connector hub and kinless hub</p></li>
 <li><p>default value: 0.75</p></li>
 <li><p>argument type : float</p></li>
 <li><p>this argument has no effect if Params.autoSetCartographyBoundaries = 1</p></li>
@@ -1204,7 +1223,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id59"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.groupColors</span></code><a class="headerlink" href="#params-groupcolors" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>colors to use for each group in group comparison plots</p></li>
+<li><p>Colors to use for each group in group comparison plots</p></li>
 <li><p>this should be an nGroup x 3 matrix where nGroup is the number of groups you have, and each row is a RGB value (scaled from 0 to 1) denoting the color</p></li>
 </ul>
 </div></blockquote>
@@ -1213,7 +1232,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id60"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.GrpNm</span></code><a class="headerlink" href="#params-grpnm" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>list of names corresponding to the different groups</p></li>
+<li><p>List of names corresponding to the different groups</p></li>
 <li><p>this is automatically generated through the provided spreadsheet and requires no user input in most cases</p></li>
 <li><p>argument type : cell array of string / characters with number of entries equal to the number of unique groups</p></li>
 </ul>
@@ -1223,7 +1242,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <span id="id61"></span><h4><code class="docutils literal notranslate"><span class="pre">Params.DivNm</span></code><a class="headerlink" href="#params-divnm" title="Link to this heading">#</a></h4>
 <blockquote>
 <div><ul class="simple">
-<li><p>list of numbers corresponding to the days in vitro (or any quantification of development time point)</p></li>
+<li><p>List of numbers corresponding to the days in vitro (or any quantification of development time point)</p></li>
 <li><p>this is automatically generated through the provided spreadsheet and requires no user input in most cases</p></li>
 <li><p>argument type : cell array of integers or float with number of entries equal to the number of unique developmental time points</p></li>
 </ul>
@@ -1262,7 +1281,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
         <div class="bottom-of-page">
           <div class="left-details">
             <div class="copyright">
-                Copyright &#169; 2022, Timothy Sit, Rachael Feord, Alexander Dunn, Jeremy Chabros, Mierau SB and SAND group members
+                Copyright &#169; 2022, Timothy Sit, Rachael Feord, Alexander Dunn, Jeremy Chabros, Susanna Mierau, and SAND group members
             </div>
             Made with <a href="https://www.sphinx-doc.org/">Sphinx</a> and <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
             
@@ -1293,15 +1312,15 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
 <li><a class="reference internal" href="#starting-mea-nap">Starting MEA-NAP</a><ul>
 <li><a class="reference internal" href="#required-user-input-in-the-first-section-of-mea-nap">Required user input in the first section of MEA-NAP</a></li>
 <li><a class="reference internal" href="#options-to-start-the-pipeline-at-different-steps">Options to start the pipeline at different steps</a></li>
-<li><a class="reference internal" href="#spike-detection-settings-lines-13-95">Spike detection settings (lines 13 - 95)</a></li>
-<li><a class="reference internal" href="#functional-connectivity-settings">Functional connectivity settings</a></li>
-<li><a class="reference internal" href="#node-cartography-settings">Node cartography settings</a></li>
-<li><a class="reference internal" href="#statistics-and-machine-learning-settings">Statistics and machine learning settings</a></li>
+<li><a class="reference internal" href="#spike-detection-parameters">Spike detection parameters</a></li>
+<li><a class="reference internal" href="#functional-connectivity-parameters">Functional connectivity parameters</a></li>
+<li><a class="reference internal" href="#node-cartography-parameters">Node cartography parameters</a></li>
+<li><a class="reference internal" href="#statistics-and-machine-learning-parameters">Statistics and machine learning parameters</a></li>
 <li><a class="reference internal" href="#pipeline-output-preferences">Pipeline output preferences</a></li>
 <li><a class="reference internal" href="#run-and-wait">Run and wait</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#pipeline-settings">Pipeline settings</a><ul>
+<li><a class="reference internal" href="#pipeline-parameters">Pipeline parameters</a><ul>
 <li><a class="reference internal" href="#id3">Overview</a></li>
 <li><a class="reference internal" href="#folder-paths">Folder paths</a><ul>
 <li><a class="reference internal" href="#homedir"><code class="docutils literal notranslate"><span class="pre">HomeDir</span></code></a></li>
@@ -1397,7 +1416,7 @@ Without the interactive GUI Mode (found under ‘Guide for New Users’), you wi
   </div>
 </div><script src="_static/jquery.js?v=5d32c60e"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-    <script src="_static/documentation_options.js?v=44dfd65d"></script>
+    <script src="_static/documentation_options.js?v=72d88caf"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="_static/scripts/furo.js?v=32e29ea5"></script>

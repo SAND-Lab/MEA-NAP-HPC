@@ -68,6 +68,7 @@ function [NetMet] = ExtractNetMet(adjMs, spikeTimes, lagval,Info,HomeDir,Params,
 
 % specify list of network metrics to calculate
 netMetToCal = Params.netMetToCal;
+unitMetToCal = Params.unitLevelNetMetToPlot;
 
 % edge threshold for adjM
 edge_thresh = 0.0001;
@@ -119,6 +120,8 @@ for e = 1:length(lagval)
     iN = find(aNtemp==0);
     aNtemp(aNtemp==0) = [];  % ??? why remove the zeros?
     aN = length(aNtemp);
+    
+    activeNodeIndices = find(aNtemp > 0);
     
     clear aNtemp
     
@@ -247,39 +250,40 @@ for e = 1:length(lagval)
          SWw = nan;
          CC = nan;
          PL = nan;
-         Eloc = nan;
+         Eloc = nan(length(NS), 1);
          ElocMean = nan;
-         BC = nan;
+         BC = nan(length(NS), 1);
          BCmeantop5 = nan;
      end
     
     % participation coefficient
-%     PC = participation_coef(adjM,Ci,0);
-    if length(adjM) >= Params.minNumberOfNodesToCalNetMet
-        [PC,~,~,~] = participation_coef_norm(adjM,Ci);
-        % within module degree z-score
-        Z = module_degree_zscore(adjM,Ci,0);
-        
-        % percentage of within-module z-score greater and less than zero
-        percentZscoreGreaterThanZero = sum(Z > 0) / length(Z) * 100;
-        percentZscoreLessThanZero = sum(Z < 0) / length(Z) * 100;
-        
-        % mean participation coefficient 
-        PCmean = mean(PC);
-        PC90thpercentile = prctile(PC, 90);
-        PC10thpercentile = prctile(PC, 10);
-        PCmeanTop10 = mean(PC(PC >= PC90thpercentile));
-        PCmeanBottom10 = mean(PC(PC <= PC10thpercentile));
-        
-    else 
-        PC = nan;
-        Z = nan;
-        
-        percentZscoreGreaterThanZero = nan;
-        percentZscoreLessThanZero = nan;
-        PCmean = nan;
-        PCmeanTop10 = nan;
-        PCmeanBottom10 = nan;
+    % PC = participation_coef(adjM,Ci,0);
+    if any(strcmp(netMetToCal, 'PC')) || any(strcmp(netMetToCal, 'Hub3')) || any(strcmp(netMetToCal, 'Hub4'))
+        if length(adjM) >= Params.minNumberOfNodesToCalNetMet
+            [PC,~,~,~] = participation_coef_norm(adjM,Ci);
+            % within module degree z-score
+            Z = module_degree_zscore(adjM,Ci,0);
+
+            % percentage of within-module z-score greater and less than zero
+            percentZscoreGreaterThanZero = sum(Z > 0) / length(Z) * 100;
+            percentZscoreLessThanZero = sum(Z < 0) / length(Z) * 100;
+
+            % mean participation coefficient 
+            PCmean = mean(PC);
+            PC90thpercentile = prctile(PC, 90);
+            PC10thpercentile = prctile(PC, 10);
+            PCmeanTop10 = mean(PC(PC >= PC90thpercentile));
+            PCmeanBottom10 = mean(PC(PC <= PC10thpercentile));
+
+        else 
+            PC = nan(length(NS), 1);
+            Z = nan(length(NS), 1);
+            percentZscoreGreaterThanZero = nan;
+            percentZscoreLessThanZero = nan;
+            PCmean = nan;
+            PCmeanTop10 = nan;
+            PCmeanBottom10 = nan;
+        end 
     end 
     
 
@@ -307,35 +311,37 @@ for e = 1:length(lagval)
     end
     
     %% Hub classification (only works when number of nodes exeed criteria)
-    if aN >= Params.minNumberOfNodesToCalNetMet
-        sortND = sort(ND,'descend');
-        sortND = sortND(1:round(aN/10));
-        hubNDfind = ismember(ND, sortND);
-        [hubND, ~] = find(hubNDfind==1);
-        
-        sortPC = sort(PC,'descend');
-        sortPC = sortPC(1:round(aN/10));
-        hubPCfind = ismember(PC, sortPC);
-        [hubPC, ~] = find(hubPCfind==1);
-        
-        sortBC = sort(BC,'descend');
-        sortBC = sortBC(1:round(aN/10));
-        hubBCfind = ismember(BC, sortBC);
-        [hubBC, ~] = find(hubBCfind==1);
-        
-        sortNE = sort(NE,'descend');
-        sortNE = sortNE(1:round(aN/10));
-        hubNEfind = ismember(NE, sortNE);
-        [hubNE, ~] = find(hubNEfind==1);
-        
-        hubs = [hubND; hubPC; hubBC; hubNE];
-        [GC,~] = groupcounts(hubs);
-        Hub4 = length(find(GC==4))/aN;
-        Hub3 = length(find(GC>=3))/aN;
-    else
-        Hub4 = nan;
-        Hub3 = nan;
-    end 
+    if any(strcmp(netMetToCal, 'Hub3')) || any(strcmp(netMetToCal, 'Hub4'))
+        if aN >= Params.minNumberOfNodesToCalNetMet
+            sortND = sort(ND,'descend');
+            sortND = sortND(1:round(aN/10));
+            hubNDfind = ismember(ND, sortND);
+            [hubND, ~] = find(hubNDfind==1);
+
+            sortPC = sort(PC,'descend');
+            sortPC = sortPC(1:round(aN/10));
+            hubPCfind = ismember(PC, sortPC);
+            [hubPC, ~] = find(hubPCfind==1);
+
+            sortBC = sort(BC,'descend');
+            sortBC = sortBC(1:round(aN/10));
+            hubBCfind = ismember(BC, sortBC);
+            [hubBC, ~] = find(hubBCfind==1);
+
+            sortNE = sort(NE,'descend');
+            sortNE = sortNE(1:round(aN/10));
+            hubNEfind = ismember(NE, sortNE);
+            [hubNE, ~] = find(hubNEfind==1);
+
+            hubs = [hubND; hubPC; hubBC; hubNE];
+            [GC,~] = groupcounts(hubs);
+            Hub4 = length(find(GC==4))/aN;
+            Hub3 = length(find(GC>=3))/aN;
+        else
+            Hub4 = nan;
+            Hub3 = nan;
+        end 
+    end
 
     %% Find hubs and plot raster sorted by hubs 
     % convert spike times to spike matrix 
@@ -361,7 +367,7 @@ for e = 1:length(lagval)
     if e == 1
         if any(strcmp(netMetToCal, 'num_nnmf_components'))
             fprintf('Calculating NMF \n')
-            minSpikeCount = 10;
+            minSpikeCount = 1;
             includeRandomMatrix = 1;
             nmfCalResults = calNMF(spikeMatrix, Params.fs, Params.NMFdownsampleFreq, ...
                                     Info.duration_s, minSpikeCount, includeRandomMatrix, ...
@@ -396,9 +402,10 @@ for e = 1:length(lagval)
         
         aveControlMean = mean(aveControl);
         aveControl75thpercentile = prctile(aveControl, 75);
-        aveControlTop25 = mean(aveControlMean(aveControlMean >= aveControl75thpercentile));
+        aveControlTop25 = mean(aveControl(aveControl >= aveControl75thpercentile));
         
         NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).aveControl = aveControl;
+        NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).aveControlMean = aveControlMean;
         NetMet.(strcat('adjM',num2str(lagval(e)),'mslag')).aveControlTop25 = aveControlTop25;
     end 
 
@@ -437,7 +444,11 @@ for e = 1:length(lagval)
 
     
     %% reassign to structures
+    Var = horzcat(netMetToCal, unitMetToCal); 
+    Var{end+1} = 'activeNodeIndices';
+    Var{end+1} = 'Ci';  % community affiliation
     
+    %{
     Var = {'ND', 'NDmean', 'NDtop25', ...
           'MEW', 'sigEdgesMean', 'sigEdgesTop10', ...
           'NS', 'NSmean', ...
@@ -449,14 +460,22 @@ for e = 1:length(lagval)
         'Cmcblty', ...
         'Z', 'percentZscoreGreaterThanZero', 'percentZscoreLessThanZero', ...
         'Hub4','Hub3', 'NE'};
-
+    %}
     % 'NCpn1', 'NCpn2','NCpn3','NCpn4','NCpn5','NCpn6' were moved
+    
+    lagIndependentMetrics = {'effRank', 'num_nnmf_components', 'nComponentsRelNS', ...
+                             'nnmf_residuals', 'nnmf_var_explained', 'randResidualPerComponent', ... 
+                             'nmfFactors', 'nmfWeights', 'downSampleSpikeMatrix', 'nmfFactorsVarThreshold', ...
+                             'nmfWeightsVarThreshold'};
+    nodeCartographyMetrics = {'NCpn1', 'NCpn2','NCpn3','NCpn4','NCpn5','NCpn6'};
     
     for i = 1:length(Var)
         % TODO: remove eval 
         VN = cell2mat(Var(i));
         VNs = strcat('NetMet.adjM',num2str(lagval(e)),'mslag.',VN);
-        eval([VNs '=' VN ';']);
+        if ~ismember(VN, lagIndependentMetrics) && ~ismember(VN, nodeCartographyMetrics)
+            eval([VNs '=' VN ';']);
+        end
     end
     
     % clear variables

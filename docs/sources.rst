@@ -5,6 +5,8 @@ Code Sources
 
 The network analysis pipeline is both built on code and packages written by other users in the spike detection and network analysis community, and by our authors. In the methods section we cite packages used for corresponding analysis. Here are references, descriptions, and links for code sources and/or methods utilized in the pipeline.
 
+=========================
+
 Methods - Spike Detection
 -------------------------
 
@@ -104,6 +106,26 @@ Methods - Statistics
      - Two-factor, within-subject repeated measures ANOVA
      - rm_anova2.m
      - https://www.mathworks.com/matlabcentral/fileexchange/6874-two-way-repeated-measures-anova
+
+Tools - Data Conversion
+---------------------------------------
+
+.. list-table:: 
+   :widths: 25 25 25 25
+   :header-rows: 1 
+
+   * - References 
+     - Description 
+     - Location in MEA-NAP 
+     - Source code 
+   * - Stahl D & Hayes H (2022). AxionFileLoader: A Matlab library capable of reading Axion's RAW and SPK files. GitHub. Retrieved February 10, 2024. 
+     - Reads Axion .raw multi-well recording to extract individual MEA recordings using the AxIS MATLAB function AxisFile.m.
+     - rawConvert.m utilizes functions from AxIS MATLAB Files folder
+     - https://github.com/axionbio/AxionFileLoader
+   * - Armin Walter (2024). McsMatlabDataTools, `GitHub <https://github.com/multichannelsystems/McsMatlabDataTools/releases/tag/1.3.1>`_. Retrieved February 15, 2024.
+     - Imports HDF5 files created by Multi Channel Systems MCS software into Matlab.
+     - functions from McsMatlabDataTools
+     - https://www.mathworks.com/matlabcentral/fileexchange/54976-mcsmatlabdatatools 
 
 Tools - GUI
 -----------
