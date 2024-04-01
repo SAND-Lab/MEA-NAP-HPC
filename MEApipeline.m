@@ -11,7 +11,7 @@ close all
 restoredefaultpath
 
 % Additional parameter for HPC 
-NewFNSuffix = '(20230208_NGN2 step 2 v2)'; % Suffix that will be appended to output folder name 
+NewFNSuffix = '[INPUT_REQUIRED]'; % Suffix that will be appended to output folder name 
 Params.rasterColormap = 'parula';
 
 % Directories
@@ -79,7 +79,7 @@ Params.showOneFig = 1;  % otherwise, 0 = pipeline shows plots as it runs, 1: sup
 
 
 %% GUI / Tutorial mode settings 
-Params.guiMode = 1;   % GUI mode? 1 = on, 0 = off
+Params.guiMode = 0;   % GUI mode? 1 = on, 0 = off
 if Params.guiMode == 1
     runPipelineApp
     spikeDetectedData = Params.spikeDetectedData;
